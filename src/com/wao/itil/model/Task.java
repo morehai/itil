@@ -1,7 +1,12 @@
 package com.wao.itil.model;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
+import javax.persistence.Access;
+import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
@@ -10,9 +15,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
+import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.AutoConfig;
+import org.ironrhino.core.metadata.Hidden;
 import org.ironrhino.core.metadata.NotInCopy;
 import org.ironrhino.core.metadata.NotInJson;
 import org.ironrhino.core.metadata.UiConfig;
@@ -58,7 +66,7 @@ public class Task extends org.ironrhino.core.model.Entity<Long> {
 	 * 监控类型（复选）
 	 */
 	@Enumerated
-	private ServerMonitorType monitorType;
+	private ServerMonitorType serverMonitorType;
 
 	/**
 	 * 监控频率（单选）
@@ -89,6 +97,16 @@ public class Task extends org.ironrhino.core.model.Entity<Long> {
 	private String templateName;
 
 	/**
+	 * 任务是否被成功调度
+	 */
+	private boolean successExecuted;
+	
+	/**
+	 * 上次执行时间点
+	 */
+	private Date lastExecuted;
+	
+	/**
 	 * 创建的时间点
 	 */
 	@NotInCopy
@@ -96,6 +114,11 @@ public class Task extends org.ironrhino.core.model.Entity<Long> {
 	@Column(updatable = false)
 	@UiConfig(hidden = true)
 	private Date createTime = new Date();
+
+	// 应用名称
+	@UiConfig(hiddenInList = @Hidden(true))
+	@Transient
+	private Set<String> serverMonitors = new HashSet<String>(0);
 
 	public Task() {
 
@@ -127,12 +150,12 @@ public class Task extends org.ironrhino.core.model.Entity<Long> {
 		this.taskName = taskName;
 	}
 
-	public ServerMonitorType getMonitorType() {
-		return monitorType;
+	public ServerMonitorType getServerMonitorType() {
+		return serverMonitorType;
 	}
 
-	public void setMonitorType(ServerMonitorType monitorType) {
-		this.monitorType = monitorType;
+	public void setServerMonitorType(ServerMonitorType serverMonitorType) {
+		this.serverMonitorType = serverMonitorType;
 	}
 
 	public MonitorFrequenceType getMonitorFrequenceType() {
@@ -176,12 +199,55 @@ public class Task extends org.ironrhino.core.model.Entity<Long> {
 		this.templateName = templateName;
 	}
 
+	public boolean isSuccessExecuted() {
+		return successExecuted;
+	}
+
+	public void setSuccessExecuted(boolean successExecuted) {
+		this.successExecuted = successExecuted;
+	}
+
+	public Date getLastExecuted() {
+		return lastExecuted;
+	}
+
+	public void setLastExecuted(Date lastExecuted) {
+		this.lastExecuted = lastExecuted;
+	}
+
 	public Date getCreateTime() {
 		return createTime;
 	}
 
 	public void setCreateTime(Date createTime) {
 		this.createTime = createTime;
+	}
+
+	public Set<String> getServerMonitors() {
+		return serverMonitors;
+	}
+
+	public void setServerMonitors(Set<String> serverMonitors) {
+		this.serverMonitors = serverMonitors;
+	}
+
+	@NotInCopy
+	@NotInJson
+	@Column(name = "serverMonitors", length = 500)
+	@UiConfig(hiddenInList = @Hidden(true))
+	@Access(AccessType.PROPERTY)
+	public String getServerMonitorsAsString() {
+		if (serverMonitors.size() > 0)
+			return StringUtils.join(serverMonitors.iterator(), ',');
+		return null;
+	}
+
+	public void setServerMonitorsAsString(String serverMonitorsAsString) {
+		serverMonitors.clear();
+		if (StringUtils.isNotBlank(serverMonitorsAsString))
+			serverMonitors.addAll(Arrays
+					.asList(org.ironrhino.core.util.StringUtils.trimTail(
+							serverMonitorsAsString, ",").split("\\s*,\\s*")));
 	}
 
 	@Override

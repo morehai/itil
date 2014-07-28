@@ -1,7 +1,5 @@
 package com.wao.itil.action.api;
 
-import java.io.IOException;
-
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.JsonConfig;
 import org.ironrhino.core.struts.BaseAction;
@@ -9,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.wao.itil.service.support.GlancesService;
+import com.wao.itil.service.TaskService;
 
 /**
  * 接收客户端代理器提交上来的监控数据
@@ -23,7 +21,7 @@ public class AgentAction extends BaseAction {
 	// 返回的json格式消息
 	private String msg;
 	@Autowired
-	private GlancesService glancesServer;
+	private TaskService glancesTaskService;
 
 	/**
 	 * 校验客户端代理器的版本
@@ -53,18 +51,11 @@ public class AgentAction extends BaseAction {
 	}
 
 	/**
-	 * 客户端代理器数据的提交
+	 * 客户端代理器数据的提交，手工测试入口
 	 */
-	@JsonConfig(root = "msg")
 	public String post() {
-		try {
-			msg = glancesServer.client();
-			logger.info(msg);
-		} catch (IOException e) {
-			e.printStackTrace();
-			logger.error(e.getMessage());
-		}
-		return JSON;
+		glancesTaskService.batchSyncServerInfoForTask();
+		return null;
 	}
 
 	public String getMsg() {
