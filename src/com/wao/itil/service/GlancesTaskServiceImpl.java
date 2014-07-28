@@ -1,7 +1,9 @@
 package com.wao.itil.service;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 
@@ -15,6 +17,7 @@ import org.ironrhino.core.util.HttpClientUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.wao.itil.model.Task;
 
@@ -24,17 +27,33 @@ import com.wao.itil.model.Task;
 @Component
 public class GlancesTaskServiceImpl implements TaskService {
 
-	private String lockName = "TaskGlancesServiceImpl.batchSyncServerInfoForTask";
-	private int batchSyncSize = 5;
-	
 	@Autowired
 	private LockService lockService;
-
 	@Autowired
 	private ExecutorService executorService;
-
 	@Autowired
 	private TaskManager taskManager;
+	@Autowired
+	private CpuManager cpuManager;
+
+	@Override
+	public Map<String, String> getServerInfoByAgent(String host,
+			String[] methods) {
+		if (methods == null || methods.length == 0) {
+			return new HashMap<String, String>();
+		}
+		Map<String, String> respMap = new HashMap<String, String>();
+		for (String method : methods) {
+			try {
+				respMap.put(method, getServerInfoByAgent(host, method));
+			} catch (IOException e) {
+				e.printStackTrace();
+				// TODO 记录错误日志
+				continue;
+			}
+		}
+		return respMap;
+	}
 
 	@Override
 	public String getServerInfoByAgent(String host, String method)
@@ -57,6 +76,9 @@ public class GlancesTaskServiceImpl implements TaskService {
 		return resp;
 	}
 
+	private String lockName = "TaskGlancesServiceImpl.batchSyncServerInfoForTask";
+	private int batchSyncSize = 5;
+
 	@Override
 	@Scheduled(cron = "5 * * * * ?")
 	@Trigger
@@ -74,12 +96,11 @@ public class GlancesTaskServiceImpl implements TaskService {
 						executorService.execute(new Runnable() {
 							@Override
 							public void run() {
-								try { // TODO 分次获取服务器运行的各项监控信息
-									getServerInfoByAgent(task.getMonitorIp(),
-											task.getServerMonitorsAsString());
-								} catch (IOException e) {
-									e.printStackTrace();
-								}
+								String[] methods = task
+										.getServerMonitorsAsString().split(",");
+								Map<String, String> respMap = getServerInfoByAgent(
+										task.getMonitorIp(), methods);
+								saveServerInfo(task.getMonitorIp(), respMap);
 								cdl.countDown();
 							}
 						});
@@ -103,9 +124,48 @@ public class GlancesTaskServiceImpl implements TaskService {
 		lockService.unlock(lockName);
 	}
 
-	private String getMethod(String name){
-		
-		
-		return null;
+	@Override
+	@Transactional
+	public void saveServerInfo(String host, Map<String, String> respMap) {
+		for(String methodName: respMap.keySet()){
+			switch(methodName){
+			case "getCore":
+				// TODO CPU核心数
+				break;
+			case "getCpu":
+				// TODO CPU使用状态
+				break;
+			case "getLoad":
+				// TODO CPU使用负载
+				break;
+			case "getDiskIO":
+				// TODO 
+				break;
+			case "getFs":
+				// TODO 
+				break;
+			case "getMem":
+				// TODO 
+				break;
+			case "getMemSwap":
+				// TODO 
+				break;
+			case "getNetwork":
+				// TODO 
+				break;
+			case "getSystem":
+				// TODO 
+				break;
+			case "getProcessCount":
+				// TODO 
+				break;
+			case "getProcessList":
+				// TODO 
+				break;
+			default :
+			}
+		}
+
 	}
+
 }

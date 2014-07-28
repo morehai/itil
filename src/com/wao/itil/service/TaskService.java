@@ -1,6 +1,7 @@
 package com.wao.itil.service;
 
 import java.io.IOException;
+import java.util.Map;
 
 public interface TaskService {
 
@@ -10,7 +11,7 @@ public interface TaskService {
 	public void batchSyncServerInfoForTask();
 
 	/**
-	 * 根据服务器IP地址和API方法名获取对应的信息
+	 * 根据服务器IP地址和单一方法名获取API对应的信息
 	 * 
 	 * @param host
 	 *            服务器地址
@@ -22,4 +23,20 @@ public interface TaskService {
 	public String getServerInfoByAgent(String host, String method)
 			throws IOException;
 
+	/**
+	 *  根据服务器IP地址和多个方法名获取API对应的信息列表
+	 * @param host  服务器地址
+	 * @param methods API方法名集合
+	 * @return 服务器运行时信息集合
+	 * @throws IOException
+	 */
+	public Map<String, String> getServerInfoByAgent(String host,
+			String[] methods) throws IOException;
+	
+	/**
+	 * 保存单台服务器的多项运行时信息
+	 * @param host 服务器地址
+	 * @param respMap 运行信息
+	 */
+	public void saveServerInfo(String host, Map<String,String> respMap);
 }

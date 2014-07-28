@@ -10,7 +10,7 @@ import com.opensymphony.xwork2.util.LocalizedTextUtil;
  */
 public enum GlancesMethodType implements Displayable {
 
-	getAllLimits, getAllMonitored, getBatPercent, getCore, getCpu, getDiskIO, getFs, getHDDTemp, getLoad, getMem, getMemSwap, getNetwork, getNow, getProcessCount, getProcessList, getSensors, getSystem;
+	getCore, getCpu, getLoad, getDiskIO, getFs, getMem, getMemSwap, getNetwork, getProcessCount, getProcessList, getSystem; // getHDDTemp, getNow, getBatPercent, getSensors, getAllLimits, getAllMonitored;
 
 	@Override
 	public String getName() {
