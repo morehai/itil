@@ -7,15 +7,16 @@ import java.util.concurrent.ExecutorService;
 
 import javax.annotation.PreDestroy;
 
+import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.coordination.LockService;
 import org.ironrhino.core.metadata.Trigger;
 import org.ironrhino.core.util.ErrorMessage;
+import org.ironrhino.core.util.HttpClientUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.wao.itil.model.Task;
-import com.wao.itil.service.support.GlancesService;
 
 /**
  * 任务通过Glances代理获取被监控服务器信息
@@ -23,6 +24,9 @@ import com.wao.itil.service.support.GlancesService;
 @Component
 public class GlancesTaskServiceImpl implements TaskService {
 
+	private String lockName = "TaskGlancesServiceImpl.batchSyncServerInfoForTask";
+	private int batchSyncSize = 5;
+	
 	@Autowired
 	private LockService lockService;
 
@@ -32,8 +36,26 @@ public class GlancesTaskServiceImpl implements TaskService {
 	@Autowired
 	private TaskManager taskManager;
 
-	@Autowired
-	private GlancesService glancesService;
+	@Override
+	public String getServerInfoByAgent(String host, String method)
+			throws IOException {
+
+		if (StringUtils.isNotBlank(host)) {
+			host = "http://" + host + ":61209/RPC2";
+		}
+		if (StringUtils.isNotBlank(method)) {
+			host = "<methodName>" + method + "</methodName>";
+		}
+
+		String resp = HttpClientUtils.post(host, method);
+		if (resp.indexOf("<string>") > 0) {
+			resp = resp.substring(resp.indexOf("<string>") + 8,
+					resp.indexOf("</string>"));
+		} else {
+			return null;
+		}
+		return resp;
+	}
 
 	@Override
 	@Scheduled(cron = "5 * * * * ?")
@@ -53,7 +75,8 @@ public class GlancesTaskServiceImpl implements TaskService {
 							@Override
 							public void run() {
 								try { // TODO 分次获取服务器运行的各项监控信息
-									glancesService.getServerInfoByAgent(task.getMonitorIp(), task.getServerMonitorsAsString());
+									getServerInfoByAgent(task.getMonitorIp(),
+											task.getServerMonitorsAsString());
 								} catch (IOException e) {
 									e.printStackTrace();
 								}
@@ -80,7 +103,9 @@ public class GlancesTaskServiceImpl implements TaskService {
 		lockService.unlock(lockName);
 	}
 
-	private String lockName = "TaskGlancesServiceImpl.batchSyncServerInfoForTask";
-	private int batchSyncSize = 5;
-
+	private String getMethod(String name){
+		
+		
+		return null;
+	}
 }
