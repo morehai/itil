@@ -34,9 +34,9 @@ public interface TaskService {
 			String[] methods) throws IOException;
 	
 	/**
-	 * 保存单台服务器的多项运行时信息
+	 * 将单台服务器的多项运行时信息封装成持久对象入队
 	 * @param host 服务器地址
 	 * @param respMap 运行信息
 	 */
-	public void saveServerInfo(String host, Map<String,String> respMap);
+	public void transferServerInfo(String host, Map<String,String> respMap);
 }

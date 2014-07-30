@@ -24,67 +24,43 @@ import org.ironrhino.core.search.elasticsearch.annotations.SearchableId;
 import org.ironrhino.core.security.role.UserRole;
 
 /**
- * 服务器内存使用情况模型 <code>
- * {"available": 7158685696, "used": 1124143104, "cached": 278761472, "percent": 13.6, "free": 7158685696, 
- * "inactive": 178905088, "active": 1125826560, "total": 8282828800, "buffers": 49258496}
+ * 服务器交换内存空间使用情况模型 <code>
+ * {"used": 0, "percent": 0.0, "free": 8493461504, "sout": 0, "total": 8493461504, "sin": 0}
  * </code>
  */
 @Entity
-@Table(name = "memory")
+@Table(name = "memory_swap")
 @Searchable
 @AutoConfig
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
-public class Memory extends org.ironrhino.core.model.Entity<Long> {
+public class MemorySwap extends org.ironrhino.core.model.Entity<Long> {
 
 	private static final long serialVersionUID = 913379597228395999L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO, generator = "memory_entity_seq")
-	@SequenceGenerator(name = "memory_entity_seq", sequenceName = "memory_entity_seq", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "memoryswap_entity_seq")
+	@SequenceGenerator(name = "memoryswap_entity_seq", sequenceName = "memoryswap_entity_seq")
 	private Long id;
 
 	/**
-	 * 物理内存总容量
+	 * 总容量
 	 */
 	private long total;
 
 	/**
-	 * 可用内存容量
-	 */
-	private long available;
-
-	/**
-	 * 活跃内存容量
-	 */
-	private long active;
-
-	/**
-	 * 非活跃内存容量
-	 */
-	private long inactive;
-
-	/**
-	 * 已使用内存容量
-	 */
-	private long used;
-
-	/**
-	 * 已被缓存容量
-	 */
-	private long cached;
-
-	/**
-	 * 空闲容量
+	 * 交换内存剩余容量
 	 */
 	private long free;
 
 	/**
-	 * 缓冲区容量
+	 * 交换内存已使用容量
 	 */
-	private long buffers;
+	private long used;
+	private long sin;
+	private long sout;
 
 	/**
-	 * 内存容量使用占比
+	 * 交换内存使用率百分比
 	 */
 	private float percent;
 
@@ -101,7 +77,7 @@ public class Memory extends org.ironrhino.core.model.Entity<Long> {
 	@JoinColumn(name = "systemId", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	private System system;
 
-	public Memory() {
+	public MemorySwap() {
 
 	}
 
@@ -123,44 +99,12 @@ public class Memory extends org.ironrhino.core.model.Entity<Long> {
 		this.total = total;
 	}
 
-	public long getAvailable() {
-		return available;
-	}
-
-	public void setAvailable(long available) {
-		this.available = available;
-	}
-
-	public long getActive() {
-		return active;
-	}
-
-	public void setActive(long active) {
-		this.active = active;
-	}
-
-	public long getInactive() {
-		return inactive;
-	}
-
-	public void setInactive(long inactive) {
-		this.inactive = inactive;
-	}
-
 	public long getUsed() {
 		return used;
 	}
 
 	public void setUsed(long used) {
 		this.used = used;
-	}
-
-	public long getCached() {
-		return cached;
-	}
-
-	public void setCached(long cached) {
-		this.cached = cached;
 	}
 
 	public long getFree() {
@@ -171,20 +115,36 @@ public class Memory extends org.ironrhino.core.model.Entity<Long> {
 		this.free = free;
 	}
 
-	public long getBuffers() {
-		return buffers;
-	}
-
-	public void setBuffers(long buffers) {
-		this.buffers = buffers;
-	}
-
 	public float getPercent() {
 		return percent;
 	}
 
 	public void setPercent(float percent) {
 		this.percent = percent;
+	}
+
+	public long getSin() {
+		return sin;
+	}
+
+	public void setSin(long sin) {
+		this.sin = sin;
+	}
+
+	public long getSout() {
+		return sout;
+	}
+
+	public void setSout(long sout) {
+		this.sout = sout;
+	}
+
+	public System getSystem() {
+		return system;
+	}
+
+	public void setSystem(System system) {
+		this.system = system;
 	}
 
 	public Date getTimeSinceUpdate() {

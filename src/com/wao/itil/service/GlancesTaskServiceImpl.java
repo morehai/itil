@@ -17,9 +17,13 @@ import org.ironrhino.core.util.HttpClientUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.wao.itil.model.Task;
+import com.wao.itil.queue.RedisSimpleCpuMessageQueue;
+import com.wao.itil.queue.RedisSimpleDiskioMessageQueue;
+import com.wao.itil.queue.RedisSimpleMemoryMessageQueue;
+import com.wao.itil.queue.RedisSimpleProcessMessageQueue;
+import com.wao.itil.queue.RedisSimpleSystemMessageQueue;
 
 /**
  * 任务通过Glances代理获取被监控服务器信息
@@ -34,7 +38,15 @@ public class GlancesTaskServiceImpl implements TaskService {
 	@Autowired
 	private TaskManager taskManager;
 	@Autowired
-	private CpuManager cpuManager;
+	private RedisSimpleCpuMessageQueue redisSimpleCpuMessageQueue;
+	@Autowired
+	private RedisSimpleDiskioMessageQueue redisSimpleDisksMessageQueue;
+	@Autowired
+	private RedisSimpleMemoryMessageQueue redisSimpleMemoryMessageQueue;
+	@Autowired
+	private RedisSimpleProcessMessageQueue redisSimpleProcessesMessageQueue;
+	@Autowired
+	private RedisSimpleSystemMessageQueue redisSimpleSystemsMessageQueue;
 
 	@Override
 	public Map<String, String> getServerInfoByAgent(String host,
@@ -100,7 +112,7 @@ public class GlancesTaskServiceImpl implements TaskService {
 										.getServerMonitorsAsString().split(",");
 								Map<String, String> respMap = getServerInfoByAgent(
 										task.getMonitorIp(), methods);
-								saveServerInfo(task.getMonitorIp(), respMap);
+								transferServerInfo(task.getMonitorIp(), respMap);
 								cdl.countDown();
 							}
 						});
@@ -125,47 +137,49 @@ public class GlancesTaskServiceImpl implements TaskService {
 	}
 
 	@Override
-	@Transactional
-	public void saveServerInfo(String host, Map<String, String> respMap) {
-		for(String methodName: respMap.keySet()){
-			switch(methodName){
+	public void transferServerInfo(String host, Map<String, String> respMap) {
+		for (String methodName : respMap.keySet()) {
+			switch (methodName) {
 			case "getCore":
-				// TODO CPU核心数
+				redisSimpleCpuMessageQueue.produce(respMap.get("getCore"));
 				break;
 			case "getCpu":
-				// TODO CPU使用状态
+				redisSimpleCpuMessageQueue.produce(respMap.get("getCpu"));
 				break;
 			case "getLoad":
-				// TODO CPU使用负载
+				redisSimpleCpuMessageQueue.produce(respMap.get("getLoad"));
 				break;
 			case "getDiskIO":
-				// TODO 
+				redisSimpleDisksMessageQueue.produce(respMap.get("getDiskIO"));
 				break;
 			case "getFs":
-				// TODO 
+				redisSimpleDisksMessageQueue.produce(respMap.get("getFs"));
 				break;
 			case "getMem":
-				// TODO 
+				redisSimpleMemoryMessageQueue.produce(respMap.get("getMem"));
 				break;
 			case "getMemSwap":
-				// TODO 
+				redisSimpleMemoryMessageQueue
+						.produce(respMap.get("getMemSwap"));
 				break;
 			case "getNetwork":
-				// TODO 
+				// TODO
 				break;
 			case "getSystem":
-				// TODO 
+				redisSimpleSystemsMessageQueue
+						.produce(respMap.get("getSystem"));
 				break;
 			case "getProcessCount":
-				// TODO 
+				redisSimpleProcessesMessageQueue.produce(respMap
+						.get("getProcessCount"));
 				break;
 			case "getProcessList":
-				// TODO 
+				redisSimpleProcessesMessageQueue.produce(respMap
+						.get("getProcessList"));
 				break;
-			default :
+			default:
 			}
 		}
 
 	}
-
 }

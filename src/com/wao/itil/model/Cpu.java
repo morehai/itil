@@ -24,7 +24,10 @@ import org.ironrhino.core.search.elasticsearch.annotations.SearchableId;
 import org.ironrhino.core.security.role.UserRole;
 
 /**
- * 服务器CPU负载模型
+ * 服务器CPU使用状态百分比模型 <code>
+ * {"softirq": 0.0, "iowait": 0.0, "system": 2.3, "guest": 0.0, "idle": 93.2, 
+ * "user": 4.5, "guest_nice": 0.0, "irq": 0.0, "steal": 0.0, "nice": 0.0}
+ * </code>
  */
 @Entity
 @Table(name = "cpu")
@@ -39,31 +42,6 @@ public class Cpu extends org.ironrhino.core.model.Entity<Long> {
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "cpu_entity_seq")
 	@SequenceGenerator(name = "cpu_entity_seq", sequenceName = "cpu_entity_seq", allocationSize = 1)
 	private Long id;
-
-	/**
-	 * 物理内核数量
-	 */
-	private String phys;
-
-	/**
-	 * 逻辑内核数量
-	 */
-	private String cpucore;
-
-	/**
-	 * 1分钟平均负载
-	 */
-	private float min1;
-
-	/**
-	 * 5分钟平均负载
-	 */
-	private float min5;
-
-	/**
-	 * 15分钟平均负载
-	 */
-	private float min15;
 
 	/**
 	 * 用户态使用的cpu百分比,不包括虚拟处理器
@@ -126,7 +104,7 @@ public class Cpu extends org.ironrhino.core.model.Entity<Long> {
 	@UiConfig(hiddenInView = @Hidden(true))
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "systemId", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-	private Systems system;
+	private System system;
 
 	public Cpu() {
 
@@ -142,46 +120,6 @@ public class Cpu extends org.ironrhino.core.model.Entity<Long> {
 		this.id = id;
 	}
 
-	public String getPhys() {
-		return phys;
-	}
-
-	public void setPhys(String phys) {
-		this.phys = phys;
-	}
-
-	public String getCpucore() {
-		return cpucore;
-	}
-
-	public void setCpucore(String cpucore) {
-		this.cpucore = cpucore;
-	}
-
-	public float getMin1() {
-		return min1;
-	}
-
-	public void setMin1(float min1) {
-		this.min1 = min1;
-	}
-
-	public float getMin5() {
-		return min5;
-	}
-
-	public void setMin5(float min5) {
-		this.min5 = min5;
-	}
-
-	public float getMin15() {
-		return min15;
-	}
-
-	public void setMin15(float min15) {
-		this.min15 = min15;
-	}
-
 	public float getSystemPercent() {
 		return systemPercent;
 	}
@@ -190,11 +128,11 @@ public class Cpu extends org.ironrhino.core.model.Entity<Long> {
 		this.systemPercent = systemPercent;
 	}
 
-	public Systems getSystem() {
+	public System getSystem() {
 		return system;
 	}
 
-	public void setSystem(Systems system) {
+	public void setSystem(System system) {
 		this.system = system;
 	}
 

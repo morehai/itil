@@ -24,36 +24,24 @@ import org.ironrhino.core.search.elasticsearch.annotations.SearchableId;
 import org.ironrhino.core.security.role.UserRole;
 
 /**
- * 服务器磁盘及文件空间使用情况模型
+ * 磁盘文件系统使用情况模型 <code>
+ * [{"mnt_point": "/", "used": 14453231616, "percent": 20.6, "device_name": "/dev/mapper/gringserver-root", "fs_type": "ext4", "size": 70084247552}, 
+ * {"mnt_point": "/boot", "used": 217944064, "percent": 91.3, "device_name": "/dev/sda1", "fs_type": "ext2", "size": 238787584}]
+ * </code>
  */
 @Entity
-@Table(name = "disks")
+@Table(name = "filesystem")
 @Searchable
 @AutoConfig
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
-public class Disks extends org.ironrhino.core.model.Entity<Long> {
+public class FileSystem extends org.ironrhino.core.model.Entity<Long> {
 
 	private static final long serialVersionUID = -3347052763935939009L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO, generator = "disks_entity_seq")
-	@SequenceGenerator(name = "disks_entity_seq", sequenceName = "disks_entity_seq", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "filesystem_entity_seq")
+	@SequenceGenerator(name = "filesystem_entity_seq", sequenceName = "filesystem_entity_seq")
 	private Long id;
-
-	/**
-	 * 磁盘分区名称
-	 */
-	private String diskName;
-
-	/**
-	 * 读取字节数
-	 */
-	private long readBytes;
-
-	/**
-	 * 写入字节数
-	 */
-	private long writeBytes;
 
 	/**
 	 * 文件系统名称
@@ -91,9 +79,9 @@ public class Disks extends org.ironrhino.core.model.Entity<Long> {
 	@UiConfig(hiddenInView = @Hidden(true))
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "systemId", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-	private Systems system;
-	
-	public Disks() {
+	private System system;
+
+	public FileSystem() {
 
 	}
 
@@ -105,30 +93,6 @@ public class Disks extends org.ironrhino.core.model.Entity<Long> {
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public String getDiskName() {
-		return diskName;
-	}
-
-	public void setDiskName(String diskName) {
-		this.diskName = diskName;
-	}
-
-	public long getReadBytes() {
-		return readBytes;
-	}
-
-	public void setReadBytes(long readBytes) {
-		this.readBytes = readBytes;
-	}
-
-	public long getWriteBytes() {
-		return writeBytes;
-	}
-
-	public void setWriteBytes(long writeBytes) {
-		this.writeBytes = writeBytes;
 	}
 
 	public String getDeviceName() {

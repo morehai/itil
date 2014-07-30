@@ -19,14 +19,16 @@ import org.ironrhino.core.search.elasticsearch.annotations.SearchableId;
 import org.ironrhino.core.security.role.UserRole;
 
 /**
- * 服务器IP地址主机名称操作系统相关信息模型
+ * 服务器系统基本信息模型 <code>
+ * {"linux_distro": "Ubuntu 12.04", "platform": "64bit", "os_name": "Linux", "hostname": "gringserver", "os_version": "3.2.0-64-generic"}
+ * </code>
  */
 @Entity
 @Table(name = "systems")
 @Searchable
 @AutoConfig
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
-public class Systems extends org.ironrhino.core.model.Entity<Long> {
+public class System extends org.ironrhino.core.model.Entity<Long> {
 
 	private static final long serialVersionUID = 8726302574819622122L;
 
@@ -36,9 +38,9 @@ public class Systems extends org.ironrhino.core.model.Entity<Long> {
 	private Long id;
 
 	/**
-	 * 服务器IP地址
+	 * 服务器地址
 	 */
-	private String hostIp;
+	private String host;
 
 	/**
 	 * 服务器名称
@@ -71,7 +73,7 @@ public class Systems extends org.ironrhino.core.model.Entity<Long> {
 	@UiConfig(hiddenInView = @Hidden(true), hiddenInInput = @Hidden(true), hiddenInList = @Hidden(true))
 	private Date timeSinceUpdate = new Date();
 
-	public Systems() {
+	public System() {
 
 	}
 
@@ -85,12 +87,12 @@ public class Systems extends org.ironrhino.core.model.Entity<Long> {
 		this.id = id;
 	}
 
-	public String getHostIp() {
-		return hostIp;
+	public String getHost() {
+		return host;
 	}
 
-	public void setHostIp(String hostIp) {
-		this.hostIp = hostIp;
+	public void setHost(String host) {
+		this.host = host;
 	}
 
 	public String getHostName() {
