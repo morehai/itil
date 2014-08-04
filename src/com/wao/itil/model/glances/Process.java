@@ -2,6 +2,8 @@ package com.wao.itil.model.glances;
 
 import java.io.Serializable;
 
+import org.ironrhino.core.metadata.NotInCopy;
+
 /**
  * 服务器进程详细模型 <code>
  * [{"username": "root", "status": "S", "cpu_times": [0.13, 0.62], "name": "init", "memory_percent": 0.028434729931880277, 
@@ -21,9 +23,12 @@ public class Process implements Serializable {
 
 	private String username;
 	private String status;
+	@NotInCopy
 	private double[] cpu_times;
 	private String name;
+	@NotInCopy
 	private double memory_percent;
+	@NotInCopy
 	private double cpu_percent;
 	private int pid;
 	/*
@@ -31,9 +36,12 @@ public class Process implements Serializable {
 	 * If io_tag = 0 : Access denied 
 	 * If io_tag = 1 : No access denied (display the IO rate)
 	 */
+	@NotInCopy
 	private long[] io_counters;
 	private String cmdline;
+	@NotInCopy
 	private long[] memory_info;
+	@NotInCopy
 	private double time_since_update;
 	private long nice;
 

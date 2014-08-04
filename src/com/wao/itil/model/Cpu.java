@@ -22,6 +22,7 @@ import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableId;
 import org.ironrhino.core.security.role.UserRole;
+import org.ironrhino.core.util.BeanUtils;
 
 /**
  * 服务器CPU使用状态百分比模型 <code>
@@ -30,7 +31,7 @@ import org.ironrhino.core.security.role.UserRole;
  * </code>
  */
 @Entity
-@Table(name = "cpu")
+@Table(name = "itil_cpu")
 @Searchable
 @AutoConfig
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
@@ -40,13 +41,13 @@ public class Cpu extends org.ironrhino.core.model.Entity<Long> {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "cpu_entity_seq")
-	@SequenceGenerator(name = "cpu_entity_seq", sequenceName = "cpu_entity_seq", allocationSize = 1)
+	@SequenceGenerator(name = "cpu_entity_seq", sequenceName = "cpu_entity_seq")
 	private Long id;
 
 	/**
 	 * 用户态使用的cpu百分比,不包括虚拟处理器
 	 */
-	private float userStatus;
+	private float user;
 
 	/**
 	 * 内核态占用的cpu百分比
@@ -56,7 +57,7 @@ public class Cpu extends org.ironrhino.core.model.Entity<Long> {
 	/**
 	 * 花费在虚拟处理器的cpu百分比
 	 */
-	private float guestStatus;
+	private float guest;
 
 	/**
 	 * 花费在硬件中断上的cpu百分比
@@ -94,20 +95,25 @@ public class Cpu extends org.ironrhino.core.model.Entity<Long> {
 	private float guestNice;
 
 	/**
-	 * 读取的时间点
+	 * 数据请求的时间点
 	 */
-	@UiConfig(hiddenInView = @Hidden(true), hiddenInInput = @Hidden(true), hiddenInList = @Hidden(true))
-	private Date timeSinceUpdate;
+	@UiConfig(hidden = true)
+	private Date createDate = new Date();
 
-	// 关联的主机系统
+	// 关联的任务
 	@NotInJson
 	@UiConfig(hiddenInView = @Hidden(true))
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
-	@JoinColumn(name = "systemId", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-	private System system;
+	@JoinColumn(name = "taskId", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+	private Task task;
 
 	public Cpu() {
+	}
 
+	public Cpu(com.wao.itil.model.glances.Cpu cpuGlances) {
+		BeanUtils.copyProperties(cpuGlances, this);
+		systemPercent = cpuGlances.getSystem();
+		guestNice = cpuGlances.getGuest_nice();
 	}
 
 	@Override
@@ -118,38 +124,6 @@ public class Cpu extends org.ironrhino.core.model.Entity<Long> {
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public float getSystemPercent() {
-		return systemPercent;
-	}
-
-	public void setSystemPercent(float systemPercent) {
-		this.systemPercent = systemPercent;
-	}
-
-	public System getSystem() {
-		return system;
-	}
-
-	public void setSystem(System system) {
-		this.system = system;
-	}
-
-	public float getUserStatus() {
-		return userStatus;
-	}
-
-	public void setUserStatus(float userStatus) {
-		this.userStatus = userStatus;
-	}
-
-	public float getGuestStatus() {
-		return guestStatus;
-	}
-
-	public void setGuestStatus(float guestStatus) {
-		this.guestStatus = guestStatus;
 	}
 
 	public float getIrq() {
@@ -208,12 +182,44 @@ public class Cpu extends org.ironrhino.core.model.Entity<Long> {
 		this.guestNice = guestNice;
 	}
 
-	public Date getTimeSinceUpdate() {
-		return timeSinceUpdate;
+	public float getUser() {
+		return user;
 	}
 
-	public void setTimeSinceUpdate(Date timeSinceUpdate) {
-		this.timeSinceUpdate = timeSinceUpdate;
+	public void setUser(float user) {
+		this.user = user;
+	}
+
+	public float getSystemPercent() {
+		return systemPercent;
+	}
+
+	public void setSystemPercent(float systemPercent) {
+		this.systemPercent = systemPercent;
+	}
+
+	public float getGuest() {
+		return guest;
+	}
+
+	public void setGuest(float guest) {
+		this.guest = guest;
+	}
+
+	public Date getCreateDate() {
+		return createDate;
+	}
+
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
+	}
+
+	public Task getTask() {
+		return task;
+	}
+
+	public void setTask(Task task) {
+		this.task = task;
 	}
 
 	@Override

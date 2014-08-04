@@ -10,16 +10,16 @@ import org.ironrhino.core.service.BaseManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.wao.itil.model.Cpu;
+import com.wao.itil.model.MemorySwap;
 
 @Component
-public class RedisSimpleCpuMessageQueue extends RedisQueue<Cpu> {
+public class RedisSimpleMemorySwapMessageQueue extends RedisQueue<MemorySwap> {
 
 	@Autowired(required = false)
 	private ExecutorService executorService;
 
 	@Autowired
-	private BaseManager<Cpu> baseManager;
+	private BaseManager<MemorySwap> baseManager;
 
 	private boolean stop;
 
@@ -53,8 +53,8 @@ public class RedisSimpleCpuMessageQueue extends RedisQueue<Cpu> {
 	}
 
 	@Override
-	public void consume(Cpu cpu) {
-		baseManager.save(cpu);
+	public void consume(MemorySwap memorySwap) {
+		baseManager.save(memorySwap);
 	}
 
 }

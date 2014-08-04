@@ -2,6 +2,8 @@ package com.wao.itil.model.glances;
 
 import java.io.Serializable;
 
+import org.ironrhino.core.metadata.NotInCopy;
+
 /**
  * 服务器磁盘使用情况模型 <code>
  * [{"time_since_update": 0.22548890113830566, "read_bytes": 0, "write_bytes": 0, "disk_name": "dm-1"}, 
@@ -14,27 +16,31 @@ import java.io.Serializable;
 public class Diskio implements Serializable {
 
 	private static final long serialVersionUID = -8970404097979036902L;
-	
+
 	/**
 	 * 磁盘分区名称
 	 */
+	@NotInCopy
 	private String disk_name;
 
 	/**
 	 * 读取字节数
 	 */
+	@NotInCopy
 	private int read_bytes;
-	
+
 	/**
 	 * 写入字节数
 	 */
+	@NotInCopy
 	private int write_bytes;
 
 	/**
 	 * 读取的时间点
 	 */
+	@NotInCopy
 	private double time_since_update;
-	
+
 	public Diskio() {
 
 	}
@@ -71,12 +77,12 @@ public class Diskio implements Serializable {
 		this.disk_name = disk_name;
 	}
 
-    public long getBytesReadPerSec() {
-        return (long) (getRead_bytes() / getTime_since_update());
-    }
+	public long getBytesReadPerSec() {
+		return (long) (getRead_bytes() / getTime_since_update());
+	}
 
-    public long getBytesWrittenPerSec() {
-        return (long) (getWrite_bytes() / getTime_since_update());
-    }
-    
+	public long getBytesWrittenPerSec() {
+		return (long) (getWrite_bytes() / getTime_since_update());
+	}
+
 }

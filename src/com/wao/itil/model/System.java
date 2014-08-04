@@ -2,10 +2,15 @@ package com.wao.itil.model;
 
 import java.util.Date;
 
+import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
@@ -17,6 +22,7 @@ import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableId;
 import org.ironrhino.core.security.role.UserRole;
+import org.ironrhino.core.util.BeanUtils;
 
 /**
  * 服务器系统基本信息模型 <code>
@@ -24,17 +30,17 @@ import org.ironrhino.core.security.role.UserRole;
  * </code>
  */
 @Entity
-@Table(name = "systems")
+@Table(name = "system")
 @Searchable
 @AutoConfig
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 public class System extends org.ironrhino.core.model.Entity<Long> {
 
-	private static final long serialVersionUID = 8726302574819622122L;
+	private static final long serialVersionUID = 9145676201413529846L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO, generator = "systems_entity_seq")
-	@SequenceGenerator(name = "systems_entity_seq", sequenceName = "systems_entity_seq", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "system_entity_seq")
+	@SequenceGenerator(name = "system_entity_seq", sequenceName = "system_entity_seq")
 	private Long id;
 
 	/**
@@ -68,13 +74,26 @@ public class System extends org.ironrhino.core.model.Entity<Long> {
 	private String osVersion;
 
 	/**
-	 * 读取的时间点
+	 * 数据请求的时间点
 	 */
-	@UiConfig(hiddenInView = @Hidden(true), hiddenInInput = @Hidden(true), hiddenInList = @Hidden(true))
-	private Date timeSinceUpdate = new Date();
+	@UiConfig(hidden = true)
+	private Date createDate = new Date();
+
+	// 关联的任务
+	@NotInJson
+	@UiConfig(hiddenInView = @Hidden(true))
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(name = "taskId", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+	private Task task;
 
 	public System() {
+	}
 
+	public System(com.wao.itil.model.glances.System systemGlances) {
+		BeanUtils.copyProperties(systemGlances, this);
+		osName = systemGlances.getOs_name();
+		linuxDistro = systemGlances.getLinux_distro();
+		osVersion = systemGlances.getOs_version();
 	}
 
 	@Override
@@ -135,12 +154,20 @@ public class System extends org.ironrhino.core.model.Entity<Long> {
 		this.osVersion = osVersion;
 	}
 
-	public Date getTimeSinceUpdate() {
-		return timeSinceUpdate;
+	public Date getCreateDate() {
+		return createDate;
 	}
 
-	public void setTimeSinceUpdate(Date timeSinceUpdate) {
-		this.timeSinceUpdate = timeSinceUpdate;
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
+	}
+
+	public Task getTask() {
+		return task;
+	}
+
+	public void setTask(Task task) {
+		this.task = task;
 	}
 
 	@Override

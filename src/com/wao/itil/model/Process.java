@@ -22,6 +22,7 @@ import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableId;
 import org.ironrhino.core.security.role.UserRole;
+import org.ironrhino.core.util.BeanUtils;
 
 /**
  * 服务器进程详细模型 <code>
@@ -95,20 +96,35 @@ public class Process extends org.ironrhino.core.model.Entity<Long> {
 	private long nice;
 
 	/**
-	 * 读取的时间点
+	 * 持续运行时间长
 	 */
 	@UiConfig(hiddenInView = @Hidden(true), hiddenInInput = @Hidden(true), hiddenInList = @Hidden(true))
-	private Date timeSinceUpdate;
+	private double timeSinceUpdate;
 
-	// 关联的主机系统
+	/**
+	 * 数据请求的时间点
+	 */
+	@UiConfig(hidden = true)
+	private Date createDate = new Date();
+
+	// 关联的任务
 	@NotInJson
 	@UiConfig(hiddenInView = @Hidden(true))
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
-	@JoinColumn(name = "systemId", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-	private System system;
+	@JoinColumn(name = "taskId", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+	private Task task;
 
 	public Process() {
-
+	}
+	
+	public Process(com.wao.itil.model.glances.Process processGlances) {
+		BeanUtils.copyProperties(processGlances, this);
+		cpuTimes = processGlances.getCpu_times();
+		memoryPercent = processGlances.getMemory_percent();
+		cpuPercent = processGlances.getCpu_percent();
+		ioCounters = processGlances.getIo_counters();
+		memoryInfo = processGlances.getMemory_info();
+		timeSinceUpdate = processGlances.getTime_since_update();
 	}
 
 	@Override
@@ -209,12 +225,28 @@ public class Process extends org.ironrhino.core.model.Entity<Long> {
 		this.nice = nice;
 	}
 
-	public Date getTimeSinceUpdate() {
+	public double getTimeSinceUpdate() {
 		return timeSinceUpdate;
 	}
 
-	public void setTimeSinceUpdate(Date timeSinceUpdate) {
+	public void setTimeSinceUpdate(double timeSinceUpdate) {
 		this.timeSinceUpdate = timeSinceUpdate;
+	}
+
+	public Date getCreateDate() {
+		return createDate;
+	}
+
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
+	}
+
+	public Task getTask() {
+		return task;
+	}
+
+	public void setTask(Task task) {
+		this.task = task;
 	}
 
 	@Override

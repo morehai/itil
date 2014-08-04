@@ -14,11 +14,15 @@ import org.ironrhino.core.coordination.LockService;
 import org.ironrhino.core.metadata.Trigger;
 import org.ironrhino.core.util.ErrorMessage;
 import org.ironrhino.core.util.HttpClientUtils;
+import org.ironrhino.core.util.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.wao.itil.model.Task;
+import com.wao.itil.queue.RedisSimpleCoreMessageQueue;
 import com.wao.itil.queue.RedisSimpleCpuMessageQueue;
 import com.wao.itil.queue.RedisSimpleDiskioMessageQueue;
 import com.wao.itil.queue.RedisSimpleMemoryMessageQueue;
@@ -29,7 +33,7 @@ import com.wao.itil.queue.RedisSimpleSystemMessageQueue;
  * 任务通过Glances代理获取被监控服务器信息
  */
 @Component
-public class GlancesTaskServiceImpl implements TaskService {
+public class GlancesTaskService {
 
 	@Autowired
 	private LockService lockService;
@@ -38,17 +42,28 @@ public class GlancesTaskServiceImpl implements TaskService {
 	@Autowired
 	private TaskManager taskManager;
 	@Autowired
+	private RedisSimpleCoreMessageQueue redisSimpleCoreMessageQueue;
+	@Autowired
 	private RedisSimpleCpuMessageQueue redisSimpleCpuMessageQueue;
 	@Autowired
-	private RedisSimpleDiskioMessageQueue redisSimpleDisksMessageQueue;
+	private RedisSimpleDiskioMessageQueue redisSimpleDiskioMessageQueue;
 	@Autowired
 	private RedisSimpleMemoryMessageQueue redisSimpleMemoryMessageQueue;
 	@Autowired
-	private RedisSimpleProcessMessageQueue redisSimpleProcessesMessageQueue;
+	private RedisSimpleProcessMessageQueue redisSimpleProcessMessageQueue;
 	@Autowired
-	private RedisSimpleSystemMessageQueue redisSimpleSystemsMessageQueue;
+	private RedisSimpleSystemMessageQueue redisSimpleSystemMessageQueue;
 
-	@Override
+	/**
+	 * 根据服务器IP地址和多个方法名获取API对应的信息列表
+	 * 
+	 * @param host
+	 *            服务器地址
+	 * @param methods
+	 *            API方法名集合
+	 * @return 服务器运行时信息集合
+	 * @throws IOException
+	 */
 	public Map<String, String> getServerInfoByAgent(String host,
 			String[] methods) {
 		if (methods == null || methods.length == 0) {
@@ -60,14 +75,23 @@ public class GlancesTaskServiceImpl implements TaskService {
 				respMap.put(method, getServerInfoByAgent(host, method));
 			} catch (IOException e) {
 				e.printStackTrace();
-				// TODO 记录错误日志
+				//  TODO 将任务的服务器信息写入网络连接异常表中
 				continue;
 			}
 		}
 		return respMap;
 	}
 
-	@Override
+	/**
+	 * 根据服务器IP地址和单一方法名获取API对应的信息
+	 * 
+	 * @param host
+	 *            服务器地址
+	 * @param method
+	 *            API方法名
+	 * @return 服务器运行时信息
+	 * @throws IOException
+	 */
 	public String getServerInfoByAgent(String host, String method)
 			throws IOException {
 
@@ -91,7 +115,9 @@ public class GlancesTaskServiceImpl implements TaskService {
 	private String lockName = "TaskGlancesServiceImpl.batchSyncServerInfoForTask";
 	private int batchSyncSize = 5;
 
-	@Override
+	/**
+	 * 通过单次监控任务配置获取到服务器相关的监控项信息
+	 */
 	@Scheduled(cron = "5 * * * * ?")
 	@Trigger
 	public void batchSyncServerInfoForTask() {
@@ -111,8 +137,17 @@ public class GlancesTaskServiceImpl implements TaskService {
 								String[] methods = task
 										.getServerMonitorsAsString().split(",");
 								Map<String, String> respMap = getServerInfoByAgent(
-										task.getMonitorIp(), methods);
-								transferServerInfo(task.getMonitorIp(), respMap);
+										task.getHost(), methods);
+								try {
+									transferServerInfo(task, respMap);
+								} catch (JsonParseException e) {
+									e.printStackTrace();
+								} catch (JsonMappingException e) {
+									e.printStackTrace();
+								} catch (IOException e) {
+									e.printStackTrace();
+									// TODO 将任务的服务器信息写入网络连接异常表中
+								}
 								cdl.countDown();
 							}
 						});
@@ -136,46 +171,62 @@ public class GlancesTaskServiceImpl implements TaskService {
 		lockService.unlock(lockName);
 	}
 
-	@Override
-	public void transferServerInfo(String host, Map<String, String> respMap) {
+	/**
+	 * 将单台服务器的多项运行时信息封装成持久对象入队
+	 * 
+	 * @param task
+	 *            任务
+	 * @param respMap
+	 *            运行信息
+	 * @throws IOException
+	 * @throws JsonMappingException
+	 * @throws JsonParseException
+	 */
+	public void transferServerInfo(Task task, Map<String, String> respMap)
+			throws JsonParseException, JsonMappingException, IOException {
 		for (String methodName : respMap.keySet()) {
 			switch (methodName) {
+			// 1、将map中的JSON串转换成相应的对象；
+			// 2、将对象放入消息队列发送；
 			case "getCore":
-				redisSimpleCpuMessageQueue.produce(respMap.get("getCore"));
+				if (respMap.get("getCore") != null) {
+					com.wao.itil.model.glances.Core coreGlances = JsonUtils
+							.fromJson(respMap.get("getCore"),
+									com.wao.itil.model.glances.Core.class);
+					com.wao.itil.model.Core core = new com.wao.itil.model.Core(
+							coreGlances);
+					redisSimpleCoreMessageQueue.produce(core);
+				}
 				break;
 			case "getCpu":
-				redisSimpleCpuMessageQueue.produce(respMap.get("getCpu"));
+				// TODO 
 				break;
 			case "getLoad":
-				redisSimpleCpuMessageQueue.produce(respMap.get("getLoad"));
+				// TODO 
 				break;
 			case "getDiskIO":
-				redisSimpleDisksMessageQueue.produce(respMap.get("getDiskIO"));
+				// TODO 
 				break;
 			case "getFs":
-				redisSimpleDisksMessageQueue.produce(respMap.get("getFs"));
+				// TODO 
 				break;
 			case "getMem":
-				redisSimpleMemoryMessageQueue.produce(respMap.get("getMem"));
+				// TODO 
 				break;
 			case "getMemSwap":
-				redisSimpleMemoryMessageQueue
-						.produce(respMap.get("getMemSwap"));
+				// TODO 
 				break;
 			case "getNetwork":
 				// TODO
 				break;
 			case "getSystem":
-				redisSimpleSystemsMessageQueue
-						.produce(respMap.get("getSystem"));
+				// TODO 
 				break;
 			case "getProcessCount":
-				redisSimpleProcessesMessageQueue.produce(respMap
-						.get("getProcessCount"));
+				// TODO 
 				break;
 			case "getProcessList":
-				redisSimpleProcessesMessageQueue.produce(respMap
-						.get("getProcessList"));
+				// TODO 
 				break;
 			default:
 			}

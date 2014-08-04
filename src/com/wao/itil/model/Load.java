@@ -22,6 +22,7 @@ import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableId;
 import org.ironrhino.core.security.role.UserRole;
+import org.ironrhino.core.util.BeanUtils;
 
 /**
  * 服务器CPU使用负载模型 <code>
@@ -63,20 +64,23 @@ public class Load extends org.ironrhino.core.model.Entity<Long> {
 	private float min15;
 
 	/**
-	 * 读取的时间点
+	 * 数据请求的时间点
 	 */
-	@UiConfig(hiddenInView = @Hidden(true), hiddenInInput = @Hidden(true), hiddenInList = @Hidden(true))
-	private Date timeSinceUpdate;
+	@UiConfig(hidden = true)
+	private Date createDate = new Date();
 
-	// 关联的主机系统
+	// 关联的任务
 	@NotInJson
 	@UiConfig(hiddenInView = @Hidden(true))
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
-	@JoinColumn(name = "systemId", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-	private System system;
+	@JoinColumn(name = "taskId", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+	private Task task;
 
 	public Load() {
-
+	}
+	
+	public Load(com.wao.itil.model.glances.Load loadGlances){
+		BeanUtils.copyProperties(loadGlances, this);
 	}
 
 	@Override
@@ -121,20 +125,20 @@ public class Load extends org.ironrhino.core.model.Entity<Long> {
 		this.min15 = min15;
 	}
 
-	public System getSystem() {
-		return system;
+	public Date getCreateDate() {
+		return createDate;
 	}
 
-	public void setSystem(System system) {
-		this.system = system;
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
 	}
 
-	public Date getTimeSinceUpdate() {
-		return timeSinceUpdate;
+	public Task getTask() {
+		return task;
 	}
 
-	public void setTimeSinceUpdate(Date timeSinceUpdate) {
-		this.timeSinceUpdate = timeSinceUpdate;
+	public void setTask(Task task) {
+		this.task = task;
 	}
 
 	@Override

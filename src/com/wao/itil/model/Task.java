@@ -8,11 +8,16 @@ import java.util.Set;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
+import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -27,6 +32,7 @@ import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableId;
 import org.ironrhino.core.security.role.UserRole;
+import org.ironrhino.security.model.User;
 
 import com.wao.itil.model.enums.AlarmNoticeType;
 import com.wao.itil.model.enums.MonitorFrequenceType;
@@ -43,18 +49,18 @@ import com.wao.itil.model.enums.ServerMonitorType;
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 public class Task extends org.ironrhino.core.model.Entity<Long> {
 
-	private static final long serialVersionUID = -3005854986851232552L;
+	private static final long serialVersionUID = -3599196510760852871L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "task_entity_seq")
-	@SequenceGenerator(name = "task_entity_seq", sequenceName = "task_entity_seq", allocationSize = 1)
+	@SequenceGenerator(name = "task_entity_seq", sequenceName = "task_entity_seq")
 	private Long id;
 
 	/**
-	 * 被监控服务器IP地址
+	 * 被监控服务器地址
 	 */
 	@Column(nullable = false)
-	private String monitorIp;
+	private String host;
 
 	/**
 	 * 任务名称
@@ -100,12 +106,12 @@ public class Task extends org.ironrhino.core.model.Entity<Long> {
 	 * 任务是否被成功调度
 	 */
 	private boolean successExecuted;
-	
+
 	/**
 	 * 上次执行时间点
 	 */
 	private Date lastExecuted;
-	
+
 	/**
 	 * 创建的时间点
 	 */
@@ -115,10 +121,17 @@ public class Task extends org.ironrhino.core.model.Entity<Long> {
 	@UiConfig(hidden = true)
 	private Date createTime = new Date();
 
-	// 应用名称
+	// 监控类型集合
 	@UiConfig(hiddenInList = @Hidden(true))
 	@Transient
 	private Set<String> serverMonitors = new HashSet<String>(0);
+
+	// 创建者
+	@NotInJson
+	@UiConfig(hiddenInView = @Hidden(true))
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(name = "userId", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+	private User user;
 
 	public Task() {
 
@@ -134,12 +147,12 @@ public class Task extends org.ironrhino.core.model.Entity<Long> {
 		this.id = id;
 	}
 
-	public String getMonitorIp() {
-		return monitorIp;
+	public String getHost() {
+		return host;
 	}
 
-	public void setMonitorIp(String monitorIp) {
-		this.monitorIp = monitorIp;
+	public void setHost(String host) {
+		this.host = host;
 	}
 
 	public String getTaskName() {

@@ -2,6 +2,8 @@ package com.wao.itil.model.glances;
 
 import java.io.Serializable;
 
+import org.ironrhino.core.metadata.NotInCopy;
+
 /**
  * 服务器CPU使用状态百分比模型 <code>
  * {"softirq": 0.0, "iowait": 0.0, "system": 2.3, "guest": 0.0, "idle": 93.2, 
@@ -20,6 +22,7 @@ public class Cpu implements Serializable {
 	/**
 	 * 内核态占用的cpu百分比
 	 */
+	@NotInCopy
 	private float system;
 
 	/**
@@ -60,6 +63,7 @@ public class Cpu implements Serializable {
 	/**
 	 * 虚拟处理器用户态nice优先级进程占用的cpu百分比
 	 */
+	@NotInCopy
 	private float guest_nice;
 
 	public Cpu() {

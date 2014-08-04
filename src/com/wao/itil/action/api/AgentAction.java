@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.wao.itil.service.TaskService;
+import com.wao.itil.service.GlancesTaskService;
 
 /**
  * 接收客户端代理器提交上来的监控数据
@@ -21,7 +21,7 @@ public class AgentAction extends BaseAction {
 	// 返回的json格式消息
 	private String msg;
 	@Autowired
-	private TaskService glancesTaskService;
+	private GlancesTaskService glancesTaskService;
 
 	/**
 	 * 校验客户端代理器的版本

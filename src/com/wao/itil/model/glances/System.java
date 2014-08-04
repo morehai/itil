@@ -2,6 +2,8 @@ package com.wao.itil.model.glances;
 
 import java.io.Serializable;
 
+import org.ironrhino.core.metadata.NotInCopy;
+
 /**
  * 服务器系统基本信息模型 <code>
  * {"linux_distro": "Ubuntu 12.04", "platform": "64bit", "os_name": "Linux", "hostname": "gringserver", "os_version": "3.2.0-64-generic"}
@@ -15,22 +17,24 @@ public class System implements Serializable {
 	 * 服务器名称
 	 */
 	private String hostname;
-	
+
 	/**
 	 * 操作系统名称
 	 */
+	@NotInCopy
 	private String os_name;
-	
+
 	/**
 	 * 发行版名称
 	 */
+	@NotInCopy
 	private String linux_distro;
-	
+
 	/**
 	 * 平台位数
 	 */
 	private String platform;
-	
+
 	/**
 	 * 内核版本
 	 */

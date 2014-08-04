@@ -10,16 +10,17 @@ import org.ironrhino.core.service.BaseManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.wao.itil.model.Cpu;
+import com.wao.itil.model.ProcessCount;
 
 @Component
-public class RedisSimpleCpuMessageQueue extends RedisQueue<Cpu> {
+public class RedisSimpleProcessCountMessageQueue extends
+		RedisQueue<ProcessCount> {
 
 	@Autowired(required = false)
 	private ExecutorService executorService;
 
 	@Autowired
-	private BaseManager<Cpu> baseManager;
+	private BaseManager<ProcessCount> baseManager;
 
 	private boolean stop;
 
@@ -53,8 +54,8 @@ public class RedisSimpleCpuMessageQueue extends RedisQueue<Cpu> {
 	}
 
 	@Override
-	public void consume(Cpu cpu) {
-		baseManager.save(cpu);
+	public void consume(ProcessCount processCount) {
+		baseManager.save(processCount);
 	}
 
 }

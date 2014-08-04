@@ -33,13 +33,13 @@ import org.ironrhino.core.security.role.UserRole;
  * </code>
  */
 @Entity
-@Table(name = "diskio")
+@Table(name = "itil_diskio")
 @Searchable
 @AutoConfig
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 public class Diskio extends org.ironrhino.core.model.Entity<Long> {
 
-	private static final long serialVersionUID = -3347052763935939009L;
+	private static final long serialVersionUID = -8690645986780711507L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "diskio_entity_seq")
@@ -62,20 +62,32 @@ public class Diskio extends org.ironrhino.core.model.Entity<Long> {
 	private long writeBytes;
 
 	/**
-	 * 读取的时间点
+	 * 持续运行时间长
 	 */
 	@UiConfig(hiddenInView = @Hidden(true), hiddenInInput = @Hidden(true), hiddenInList = @Hidden(true))
-	private Date timeSinceUpdate;
+	private double timeSinceUpdate;
 
-	// 关联的主机系统
+	/**
+	 * 数据请求的时间点
+	 */
+	@UiConfig(hidden = true)
+	private Date createDate = new Date();
+
+	// 关联的任务
 	@NotInJson
 	@UiConfig(hiddenInView = @Hidden(true))
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
-	@JoinColumn(name = "systemId", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-	private System system;
-	
-	public Diskio() {
+	@JoinColumn(name = "taskId", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+	private Task task;
 
+	public Diskio() {
+	}
+
+	public Diskio(com.wao.itil.model.glances.Diskio diskioGlances) {
+		diskName = diskioGlances.getDisk_name();
+		readBytes = diskioGlances.getRead_bytes();
+		writeBytes = diskioGlances.getWrite_bytes();
+		timeSinceUpdate = diskioGlances.getTime_since_update();
 	}
 
 	@Override
@@ -112,12 +124,28 @@ public class Diskio extends org.ironrhino.core.model.Entity<Long> {
 		this.writeBytes = writeBytes;
 	}
 
-	public Date getTimeSinceUpdate() {
+	public double getTimeSinceUpdate() {
 		return timeSinceUpdate;
 	}
 
-	public void setTimeSinceUpdate(Date timeSinceUpdate) {
+	public void setTimeSinceUpdate(double timeSinceUpdate) {
 		this.timeSinceUpdate = timeSinceUpdate;
+	}
+
+	public Date getCreateDate() {
+		return createDate;
+	}
+
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
+	}
+
+	public Task getTask() {
+		return task;
+	}
+
+	public void setTask(Task task) {
+		this.task = task;
 	}
 
 	@Override

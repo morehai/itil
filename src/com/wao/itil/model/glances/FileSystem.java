@@ -2,6 +2,8 @@ package com.wao.itil.model.glances;
 
 import java.io.Serializable;
 
+import org.ironrhino.core.metadata.NotInCopy;
+
 /**
  * 磁盘文件系统使用情况模型 <code>
  * [{"mnt_point": "/", "used": 14453231616, "percent": 20.6, "device_name": "/dev/mapper/gringserver-root", "fs_type": "ext4", "size": 70084247552}, 
@@ -15,16 +17,19 @@ public class FileSystem implements Serializable {
 	/**
 	 * 文件系统名称
 	 */
+	@NotInCopy
 	private String device_name;
 
 	/**
 	 * 文件系统类型
 	 */
+	@NotInCopy
 	private String fs_type;
 
 	/**
 	 * 挂载名称
 	 */
+	@NotInCopy
 	private String mnt_point;
 
 	/**

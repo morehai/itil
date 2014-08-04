@@ -22,6 +22,7 @@ import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableId;
 import org.ironrhino.core.security.role.UserRole;
+import org.ironrhino.core.util.BeanUtils;
 
 /**
  * 磁盘文件系统使用情况模型 <code>
@@ -69,20 +70,26 @@ public class FileSystem extends org.ironrhino.core.model.Entity<Long> {
 	private long used;
 
 	/**
-	 * 读取的时间点
+	 * 数据请求的时间点
 	 */
-	@UiConfig(hiddenInView = @Hidden(true), hiddenInInput = @Hidden(true), hiddenInList = @Hidden(true))
-	private Date timeSinceUpdate;
+	@UiConfig(hidden = true)
+	private Date createDate = new Date();
 
-	// 关联的主机系统
+	// 关联的任务
 	@NotInJson
 	@UiConfig(hiddenInView = @Hidden(true))
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
-	@JoinColumn(name = "systemId", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-	private System system;
+	@JoinColumn(name = "taskId", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+	private Task task;
 
 	public FileSystem() {
+	}
 
+	public FileSystem(com.wao.itil.model.glances.FileSystem fileSystemGlances) {
+		BeanUtils.copyProperties(fileSystemGlances, this);
+		deviceName = fileSystemGlances.getDevice_name();
+		fsType = fileSystemGlances.getFs_type();
+		mntPoint = fileSystemGlances.getMnt_point();
 	}
 
 	@Override
@@ -135,12 +142,20 @@ public class FileSystem extends org.ironrhino.core.model.Entity<Long> {
 		this.used = used;
 	}
 
-	public Date getTimeSinceUpdate() {
-		return timeSinceUpdate;
+	public Date getCreateDate() {
+		return createDate;
 	}
 
-	public void setTimeSinceUpdate(Date timeSinceUpdate) {
-		this.timeSinceUpdate = timeSinceUpdate;
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
+	}
+
+	public Task getTask() {
+		return task;
+	}
+
+	public void setTask(Task task) {
+		this.task = task;
 	}
 
 	@Override

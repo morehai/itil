@@ -29,7 +29,7 @@ import org.ironrhino.core.security.role.UserRole;
  * </code>
  */
 @Entity
-@Table(name = "core")
+@Table(name = "itil_core")
 @Searchable
 @AutoConfig
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
@@ -45,28 +45,32 @@ public class Core extends org.ironrhino.core.model.Entity<Long> {
 	/**
 	 * 物理内核数量
 	 */
-	private String phys;
+	private int phys;
 
 	/**
 	 * 逻辑内核数量
 	 */
-	private String cpucore;
+	private int cpucore;
 
 	/**
-	 * 读取的时间点
+	 * 数据请求的时间点
 	 */
-	@UiConfig(hiddenInView = @Hidden(true), hiddenInInput = @Hidden(true), hiddenInList = @Hidden(true))
-	private Date timeSinceUpdate;
+	@UiConfig(hidden = true)
+	private Date createDate = new Date();
 
-	// 关联的主机系统
+	// 关联的任务
 	@NotInJson
 	@UiConfig(hiddenInView = @Hidden(true))
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
-	@JoinColumn(name = "systemId", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-	private System system;
+	@JoinColumn(name = "taskId", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+	private Task task;
 
 	public Core() {
+	}
 
+	public Core(com.wao.itil.model.glances.Core coreGlances) {
+		phys = coreGlances.getPhys();
+		cpucore = coreGlances.getLog();
 	}
 
 	@Override
@@ -79,36 +83,36 @@ public class Core extends org.ironrhino.core.model.Entity<Long> {
 		this.id = id;
 	}
 
-	public String getPhys() {
+	public int getPhys() {
 		return phys;
 	}
 
-	public void setPhys(String phys) {
+	public void setPhys(int phys) {
 		this.phys = phys;
 	}
 
-	public String getCpucore() {
+	public int getCpucore() {
 		return cpucore;
 	}
 
-	public void setCpucore(String cpucore) {
+	public void setCpucore(int cpucore) {
 		this.cpucore = cpucore;
 	}
 
-	public System getSystem() {
-		return system;
+	public Date getCreateDate() {
+		return createDate;
 	}
 
-	public void setSystem(System system) {
-		this.system = system;
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
 	}
 
-	public Date getTimeSinceUpdate() {
-		return timeSinceUpdate;
+	public Task getTask() {
+		return task;
 	}
 
-	public void setTimeSinceUpdate(Date timeSinceUpdate) {
-		this.timeSinceUpdate = timeSinceUpdate;
+	public void setTask(Task task) {
+		this.task = task;
 	}
 
 	@Override

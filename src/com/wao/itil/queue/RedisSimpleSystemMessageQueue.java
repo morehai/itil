@@ -1,36 +1,27 @@
 package com.wao.itil.queue;
 
-import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.ironrhino.core.redis.RedisQueue;
-import org.ironrhino.core.util.JsonUtils;
+import org.ironrhino.core.service.BaseManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.wao.itil.model.System;
-import com.wao.itil.service.SystemManager;
 
 @Component
-public class RedisSimpleSystemMessageQueue extends RedisQueue<String> implements
-		SimpleMessageQueue {
+public class RedisSimpleSystemMessageQueue extends RedisQueue<System> {
 
 	@Autowired(required = false)
 	private ExecutorService executorService;
 
 	@Autowired
-	private SystemManager systemManager;
+	private BaseManager<System> baseManager;
 
 	private boolean stop;
-
-	private static final TypeReference<System> REQUEST_TYPE = new TypeReference<System>() {
-	};
 
 	@Override
 	@PostConstruct
@@ -62,18 +53,8 @@ public class RedisSimpleSystemMessageQueue extends RedisQueue<String> implements
 	}
 
 	@Override
-	public void consume(String systemMsg) {
-		// TODO 实现消息入库操作
-		try {
-			System system = JsonUtils.fromJson(systemMsg, REQUEST_TYPE);
-		} catch (JsonParseException e) {
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
+	public void consume(System system) {
+		baseManager.save(system);
 	}
 
 }

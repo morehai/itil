@@ -10,16 +10,19 @@ import org.ironrhino.core.service.BaseManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.wao.itil.model.Cpu;
+import com.wao.itil.model.Core;
+import com.wao.itil.service.TaskManager;
 
 @Component
-public class RedisSimpleCpuMessageQueue extends RedisQueue<Cpu> {
+public class RedisSimpleCoreMessageQueue extends RedisQueue<Core> {
 
 	@Autowired(required = false)
 	private ExecutorService executorService;
 
 	@Autowired
-	private BaseManager<Cpu> baseManager;
+	private BaseManager<Core> baseManager;
+	@Autowired
+	private TaskManager taskManager;
 
 	private boolean stop;
 
@@ -53,8 +56,11 @@ public class RedisSimpleCpuMessageQueue extends RedisQueue<Cpu> {
 	}
 
 	@Override
-	public void consume(Cpu cpu) {
-		baseManager.save(cpu);
+	public void consume(Core core) {
+		baseManager.save(core);
+		
+		// TODO task已更新
+//		taskManager.update(arg0);
 	}
 
 }
