@@ -58,9 +58,6 @@ public class RedisSimpleCoreMessageQueue extends RedisQueue<Core> {
 	@Override
 	public void consume(Core core) {
 		baseManager.save(core);
-		
-		// TODO task已更新
-//		taskManager.update(arg0);
 	}
 
 }

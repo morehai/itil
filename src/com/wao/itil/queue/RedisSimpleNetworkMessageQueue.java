@@ -11,17 +11,20 @@ import org.ironrhino.core.service.BaseManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.wao.itil.model.Process;
+import com.wao.itil.model.Network;
+import com.wao.itil.service.TaskManager;
 
 @Component
-public class RedisSimpleProcessMessageQueue extends
-		RedisQueue<LinkedList<Process>> {
+public class RedisSimpleNetworkMessageQueue extends
+		RedisQueue<LinkedList<Network>> {
 
 	@Autowired(required = false)
 	private ExecutorService executorService;
 
 	@Autowired
-	private BaseManager<Process> baseManager;
+	private BaseManager<Network> baseManager;
+	@Autowired
+	private TaskManager taskManager;
 
 	private boolean stop;
 
@@ -55,9 +58,9 @@ public class RedisSimpleProcessMessageQueue extends
 	}
 
 	@Override
-	public void consume(LinkedList<Process> processList) {
-		for (Process process : processList) {
-			baseManager.save(process);
+	public void consume(LinkedList<Network> networks) {
+		for (Network network : networks) {
+			baseManager.save(network);
 		}
 	}
 

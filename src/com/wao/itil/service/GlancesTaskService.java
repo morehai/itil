@@ -2,6 +2,7 @@ package com.wao.itil.service;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -20,12 +21,18 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.wao.itil.model.Task;
 import com.wao.itil.queue.RedisSimpleCoreMessageQueue;
 import com.wao.itil.queue.RedisSimpleCpuMessageQueue;
 import com.wao.itil.queue.RedisSimpleDiskioMessageQueue;
+import com.wao.itil.queue.RedisSimpleFileSystemMessageQueue;
+import com.wao.itil.queue.RedisSimpleLoadMessageQueue;
 import com.wao.itil.queue.RedisSimpleMemoryMessageQueue;
+import com.wao.itil.queue.RedisSimpleMemorySwapMessageQueue;
+import com.wao.itil.queue.RedisSimpleNetworkMessageQueue;
+import com.wao.itil.queue.RedisSimpleProcessCountMessageQueue;
 import com.wao.itil.queue.RedisSimpleProcessMessageQueue;
 import com.wao.itil.queue.RedisSimpleSystemMessageQueue;
 
@@ -48,11 +55,26 @@ public class GlancesTaskService {
 	@Autowired
 	private RedisSimpleDiskioMessageQueue redisSimpleDiskioMessageQueue;
 	@Autowired
+	private RedisSimpleFileSystemMessageQueue redisSimpleFileSystemMessageQueue;
+	@Autowired
+	private RedisSimpleLoadMessageQueue redisSimpleLoadMessageQueue;
+	@Autowired
 	private RedisSimpleMemoryMessageQueue redisSimpleMemoryMessageQueue;
+	@Autowired
+	private RedisSimpleMemorySwapMessageQueue redisSimpleMemorySwapMessageQueue;
 	@Autowired
 	private RedisSimpleProcessMessageQueue redisSimpleProcessMessageQueue;
 	@Autowired
+	private RedisSimpleProcessCountMessageQueue redisSimpleProcessCountMessageQueue;
+	@Autowired
+	private RedisSimpleNetworkMessageQueue redisSimpleNetworkMessageQueue;
+	@Autowired
 	private RedisSimpleSystemMessageQueue redisSimpleSystemMessageQueue;
+
+	private static final TypeReference<LinkedList<com.wao.itil.model.glances.Process>> PROCESS_LIST_TYPE = new TypeReference<LinkedList<com.wao.itil.model.glances.Process>>() {
+	};
+	private static final TypeReference<LinkedList<com.wao.itil.model.glances.Network>> NETWORK_LIST_TYPE = new TypeReference<LinkedList<com.wao.itil.model.glances.Network>>() {
+	};
 
 	/**
 	 * 根据服务器IP地址和多个方法名获取API对应的信息列表
@@ -75,7 +97,7 @@ public class GlancesTaskService {
 				respMap.put(method, getServerInfoByAgent(host, method));
 			} catch (IOException e) {
 				e.printStackTrace();
-				//  TODO 将任务的服务器信息写入网络连接异常表中
+				// TODO 将任务的服务器信息写入网络连接异常表中
 				continue;
 			}
 		}
@@ -195,38 +217,128 @@ public class GlancesTaskService {
 									com.wao.itil.model.glances.Core.class);
 					com.wao.itil.model.Core core = new com.wao.itil.model.Core(
 							coreGlances);
+					core.setTask(task);
 					redisSimpleCoreMessageQueue.produce(core);
 				}
 				break;
 			case "getCpu":
-				// TODO 
-				break;
-			case "getLoad":
-				// TODO 
+				if (respMap.get("getCpu") != null) {
+					com.wao.itil.model.glances.Cpu cpuGlances = JsonUtils
+							.fromJson(respMap.get("getCpu"),
+									com.wao.itil.model.glances.Cpu.class);
+					com.wao.itil.model.Cpu cpu = new com.wao.itil.model.Cpu(
+							cpuGlances);
+					cpu.setTask(task);
+					redisSimpleCpuMessageQueue.produce(cpu);
+				}
 				break;
 			case "getDiskIO":
-				// TODO 
+				if (respMap.get("getDiskIO") != null) {
+					com.wao.itil.model.glances.Diskio diskioGlances = JsonUtils
+							.fromJson(respMap.get("getDiskIO"),
+									com.wao.itil.model.glances.Diskio.class);
+					com.wao.itil.model.Diskio diskio = new com.wao.itil.model.Diskio(
+							diskioGlances);
+					diskio.setTask(task);
+					redisSimpleDiskioMessageQueue.produce(diskio);
+				}
 				break;
 			case "getFs":
-				// TODO 
+				if (respMap.get("getFs") != null) {
+					com.wao.itil.model.glances.FileSystem fileSystemGlances = JsonUtils
+							.fromJson(respMap.get("getFs"),
+									com.wao.itil.model.glances.FileSystem.class);
+					com.wao.itil.model.FileSystem fileSystem = new com.wao.itil.model.FileSystem(
+							fileSystemGlances);
+					fileSystem.setTask(task);
+					redisSimpleFileSystemMessageQueue.produce(fileSystem);
+				}
+				break;
+			case "getLoad":
+				if (respMap.get("getLoad") != null) {
+					com.wao.itil.model.glances.Load loadGlances = JsonUtils
+							.fromJson(respMap.get("getLoad"),
+									com.wao.itil.model.glances.Load.class);
+					com.wao.itil.model.Load load = new com.wao.itil.model.Load(
+							loadGlances);
+					load.setTask(task);
+					redisSimpleLoadMessageQueue.produce(load);
+				}
 				break;
 			case "getMem":
-				// TODO 
+				if (respMap.get("getMem") != null) {
+					com.wao.itil.model.glances.Memory memoryGlances = JsonUtils
+							.fromJson(respMap.get("getMem"),
+									com.wao.itil.model.glances.Memory.class);
+					com.wao.itil.model.Memory memory = new com.wao.itil.model.Memory(
+							memoryGlances);
+					memory.setTask(task);
+					redisSimpleMemoryMessageQueue.produce(memory);
+				}
 				break;
 			case "getMemSwap":
-				// TODO 
-				break;
-			case "getNetwork":
-				// TODO
-				break;
-			case "getSystem":
-				// TODO 
+				if (respMap.get("getMemSwap") != null) {
+					com.wao.itil.model.glances.MemorySwap memorySwapGlances = JsonUtils
+							.fromJson(respMap.get("getMemSwap"),
+									com.wao.itil.model.glances.MemorySwap.class);
+					com.wao.itil.model.MemorySwap memorySwap = new com.wao.itil.model.MemorySwap(
+							memorySwapGlances);
+					memorySwap.setTask(task);
+					redisSimpleMemorySwapMessageQueue.produce(memorySwap);
+				}
 				break;
 			case "getProcessCount":
-				// TODO 
+				if (respMap.get("getProcessCount") != null) {
+					com.wao.itil.model.glances.ProcessCount processCountGlances = JsonUtils
+							.fromJson(
+									respMap.get("getProcessCount"),
+									com.wao.itil.model.glances.ProcessCount.class);
+					com.wao.itil.model.ProcessCount processCount = new com.wao.itil.model.ProcessCount(
+							processCountGlances);
+					processCount.setTask(task);
+					redisSimpleProcessCountMessageQueue.produce(processCount);
+				}
 				break;
 			case "getProcessList":
-				// TODO 
+				if (respMap.get("getProcessList") != null) {
+					List<com.wao.itil.model.glances.Process> processGlancesList = JsonUtils
+							.fromJson(respMap.get("getProcessList"),
+									PROCESS_LIST_TYPE);
+					LinkedList<com.wao.itil.model.Process> processList = new LinkedList<com.wao.itil.model.Process>();
+					for (com.wao.itil.model.glances.Process processGlances : processGlancesList) {
+						com.wao.itil.model.Process process = new com.wao.itil.model.Process(
+								processGlances);
+						process.setTask(task);
+						processList.add(process);
+					}
+					redisSimpleProcessMessageQueue.produce(processList);
+				}
+				break;
+			case "getNetwork":
+				if (respMap.get("getNetwork") != null) {
+					List<com.wao.itil.model.glances.Network> networkGlancesList = JsonUtils
+							.fromJson(respMap.get("getNetwork"),
+									NETWORK_LIST_TYPE);
+					LinkedList<com.wao.itil.model.Network> networkList = new LinkedList<com.wao.itil.model.Network>();
+					for (com.wao.itil.model.glances.Network networkGlances : networkGlancesList) {
+						com.wao.itil.model.Network network = new com.wao.itil.model.Network(
+								networkGlances);
+						network.setTask(task);
+						networkList.add(network);
+					}
+					redisSimpleNetworkMessageQueue.produce(networkList);
+				}
+				break;
+			case "getSystem":
+				if (respMap.get("getSystem") != null) {
+					com.wao.itil.model.glances.System systemGlances = JsonUtils
+							.fromJson(respMap.get("getSystem"),
+									com.wao.itil.model.glances.System.class);
+					com.wao.itil.model.System system = new com.wao.itil.model.System(
+							systemGlances);
+					system.setTask(task);
+					redisSimpleSystemMessageQueue.produce(system);
+				}
 				break;
 			default:
 			}
