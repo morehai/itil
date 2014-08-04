@@ -30,13 +30,13 @@ import org.ironrhino.core.util.BeanUtils;
  * </code>
  */
 @Entity
-@Table(name = "load")
+@Table(name = "itil_load")
 @Searchable
 @AutoConfig
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 public class Load extends org.ironrhino.core.model.Entity<Long> {
 
-	private static final long serialVersionUID = -485467448045298243L;
+	private static final long serialVersionUID = -3642929446480395590L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "load_entity_seq")

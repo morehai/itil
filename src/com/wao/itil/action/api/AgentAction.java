@@ -15,7 +15,8 @@ import com.wao.itil.service.GlancesTaskService;
 @AutoConfig
 public class AgentAction extends BaseAction {
 
-	private static final long serialVersionUID = 544037031911725466L;
+	private static final long serialVersionUID = 4206973661931995677L;
+
 	private static Logger logger = LoggerFactory.getLogger(AgentAction.class);
 
 	// 返回的json格式消息
@@ -53,9 +54,11 @@ public class AgentAction extends BaseAction {
 	/**
 	 * 客户端代理器数据的提交，手工测试入口
 	 */
+	@JsonConfig(root = "msg")
 	public String post() {
 		glancesTaskService.batchSyncServerInfoForTask();
-		return null;
+		msg="SUCCESS";
+		return JSON;
 	}
 
 	public String getMsg() {

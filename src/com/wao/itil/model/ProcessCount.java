@@ -30,13 +30,13 @@ import org.ironrhino.core.util.BeanUtils;
  * </code>
  */
 @Entity
-@Table(name = "processes_count")
+@Table(name = "itil_processes_count")
 @Searchable
 @AutoConfig
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 public class ProcessCount extends org.ironrhino.core.model.Entity<Long> {
 
-	private static final long serialVersionUID = 2087503238645080768L;
+	private static final long serialVersionUID = 8640105674392065572L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "processescount_entity_seq")
@@ -78,8 +78,9 @@ public class ProcessCount extends org.ironrhino.core.model.Entity<Long> {
 
 	public ProcessCount() {
 	}
-	
-	public ProcessCount(com.wao.itil.model.glances.ProcessCount processCountGlances) {
+
+	public ProcessCount(
+			com.wao.itil.model.glances.ProcessCount processCountGlances) {
 		BeanUtils.copyProperties(processCountGlances, this);
 	}
 

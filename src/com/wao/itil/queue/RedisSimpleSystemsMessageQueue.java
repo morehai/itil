@@ -10,16 +10,16 @@ import org.ironrhino.core.service.BaseManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.wao.itil.model.System;
+import com.wao.itil.model.Systems;
 
 @Component
-public class RedisSimpleSystemMessageQueue extends RedisQueue<System> {
+public class RedisSimpleSystemsMessageQueue extends RedisQueue<Systems> {
 
 	@Autowired(required = false)
 	private ExecutorService executorService;
 
 	@Autowired
-	private BaseManager<System> baseManager;
+	private BaseManager<Systems> baseManager;
 
 	private boolean stop;
 
@@ -53,8 +53,8 @@ public class RedisSimpleSystemMessageQueue extends RedisQueue<System> {
 	}
 
 	@Override
-	public void consume(System system) {
-		baseManager.save(system);
+	public void consume(Systems systems) {
+		baseManager.save(systems);
 	}
 
 }

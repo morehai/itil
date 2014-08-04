@@ -12,12 +12,10 @@ import javax.annotation.PreDestroy;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.coordination.LockService;
-import org.ironrhino.core.metadata.Trigger;
 import org.ironrhino.core.util.ErrorMessage;
 import org.ironrhino.core.util.HttpClientUtils;
 import org.ironrhino.core.util.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -34,7 +32,7 @@ import com.wao.itil.queue.RedisSimpleMemorySwapMessageQueue;
 import com.wao.itil.queue.RedisSimpleNetworkMessageQueue;
 import com.wao.itil.queue.RedisSimpleProcessCountMessageQueue;
 import com.wao.itil.queue.RedisSimpleProcessMessageQueue;
-import com.wao.itil.queue.RedisSimpleSystemMessageQueue;
+import com.wao.itil.queue.RedisSimpleSystemsMessageQueue;
 
 /**
  * 任务通过Glances代理获取被监控服务器信息
@@ -69,7 +67,7 @@ public class GlancesTaskService {
 	@Autowired
 	private RedisSimpleNetworkMessageQueue redisSimpleNetworkMessageQueue;
 	@Autowired
-	private RedisSimpleSystemMessageQueue redisSimpleSystemMessageQueue;
+	private RedisSimpleSystemsMessageQueue redisSimpleSystemMessageQueue;
 
 	private static final TypeReference<LinkedList<com.wao.itil.model.glances.Process>> PROCESS_LIST_TYPE = new TypeReference<LinkedList<com.wao.itil.model.glances.Process>>() {
 	};
@@ -140,8 +138,8 @@ public class GlancesTaskService {
 	/**
 	 * 通过单次监控任务配置获取到服务器相关的监控项信息
 	 */
-	@Scheduled(cron = "5 * * * * ?")
-	@Trigger
+//	@Scheduled(cron = "5 * * * * ?")
+//	@Trigger
 	public void batchSyncServerInfoForTask() {
 		if (lockService.tryLock(lockName)) {
 			try {
@@ -334,13 +332,14 @@ public class GlancesTaskService {
 					com.wao.itil.model.glances.System systemGlances = JsonUtils
 							.fromJson(respMap.get("getSystem"),
 									com.wao.itil.model.glances.System.class);
-					com.wao.itil.model.System system = new com.wao.itil.model.System(
+					com.wao.itil.model.Systems system = new com.wao.itil.model.Systems(
 							systemGlances);
 					system.setTask(task);
 					redisSimpleSystemMessageQueue.produce(system);
 				}
 				break;
 			default:
+				// TODO
 			}
 		}
 

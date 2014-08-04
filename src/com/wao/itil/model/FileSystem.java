@@ -31,13 +31,13 @@ import org.ironrhino.core.util.BeanUtils;
  * </code>
  */
 @Entity
-@Table(name = "filesystem")
+@Table(name = "itil_filesystem")
 @Searchable
 @AutoConfig
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 public class FileSystem extends org.ironrhino.core.model.Entity<Long> {
 
-	private static final long serialVersionUID = -3347052763935939009L;
+	private static final long serialVersionUID = -5764283519412629706L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "filesystem_entity_seq")

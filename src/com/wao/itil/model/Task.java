@@ -43,7 +43,7 @@ import com.wao.itil.model.enums.ServerMonitorType;
  * 服务器监控任务模型
  */
 @Entity
-@Table(name = "task")
+@Table(name = "itil_task")
 @Searchable
 @AutoConfig
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)

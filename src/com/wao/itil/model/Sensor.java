@@ -30,13 +30,13 @@ import org.ironrhino.core.util.BeanUtils;
  * </code>
  */
 @Entity
-@Table(name = "sensor")
+@Table(name = "itil_sensor")
 @Searchable
 @AutoConfig
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 public class Sensor extends org.ironrhino.core.model.Entity<Long> {
 
-	private static final long serialVersionUID = 2252939217896651426L;
+	private static final long serialVersionUID = -740027425813534494L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "sensor_entity_seq")
@@ -68,7 +68,7 @@ public class Sensor extends org.ironrhino.core.model.Entity<Long> {
 
 	public Sensor() {
 	}
-	
+
 	public Sensor(com.wao.itil.model.glances.Sensor sensorGlances) {
 		BeanUtils.copyProperties(sensorGlances, this);
 	}
@@ -120,5 +120,5 @@ public class Sensor extends org.ironrhino.core.model.Entity<Long> {
 	public boolean isNew() {
 		return id == null || id == 0;
 	}
-	
+
 }

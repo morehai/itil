@@ -38,13 +38,13 @@ import org.ironrhino.core.util.BeanUtils;
  * </code>
  */
 @Entity
-@Table(name = "process")
+@Table(name = "itil_process")
 @Searchable
 @AutoConfig
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 public class Process extends org.ironrhino.core.model.Entity<Long> {
 
-	private static final long serialVersionUID = -8611389360432926850L;
+	private static final long serialVersionUID = 38370346475256934L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "process_entity_seq")
@@ -116,7 +116,7 @@ public class Process extends org.ironrhino.core.model.Entity<Long> {
 
 	public Process() {
 	}
-	
+
 	public Process(com.wao.itil.model.glances.Process processGlances) {
 		BeanUtils.copyProperties(processGlances, this);
 		cpuTimes = processGlances.getCpu_times();

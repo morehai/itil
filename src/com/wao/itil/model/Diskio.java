@@ -39,7 +39,7 @@ import org.ironrhino.core.security.role.UserRole;
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 public class Diskio extends org.ironrhino.core.model.Entity<Long> {
 
-	private static final long serialVersionUID = -8690645986780711507L;
+	private static final long serialVersionUID = 896528351463834696L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "diskio_entity_seq")

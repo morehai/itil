@@ -31,17 +31,17 @@ import org.ironrhino.core.util.BeanUtils;
  * </code>
  */
 @Entity
-@Table(name = "memory")
+@Table(name = "itil_memory")
 @Searchable
 @AutoConfig
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 public class Memory extends org.ironrhino.core.model.Entity<Long> {
 
-	private static final long serialVersionUID = 913379597228395999L;
+	private static final long serialVersionUID = -9055059905140176093L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "memory_entity_seq")
-	@SequenceGenerator(name = "memory_entity_seq", sequenceName = "memory_entity_seq", allocationSize = 1)
+	@SequenceGenerator(name = "memory_entity_seq", sequenceName = "memory_entity_seq")
 	private Long id;
 
 	/**
@@ -104,8 +104,8 @@ public class Memory extends org.ironrhino.core.model.Entity<Long> {
 
 	public Memory() {
 	}
-	
-	public Memory(com.wao.itil.model.glances.Memory memoryGlances){
+
+	public Memory(com.wao.itil.model.glances.Memory memoryGlances) {
 		BeanUtils.copyProperties(memoryGlances, this);
 	}
 

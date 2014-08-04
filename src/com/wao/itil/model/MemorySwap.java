@@ -30,13 +30,13 @@ import org.ironrhino.core.util.BeanUtils;
  * </code>
  */
 @Entity
-@Table(name = "memory_swap")
+@Table(name = "itil_memory_swap")
 @Searchable
 @AutoConfig
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 public class MemorySwap extends org.ironrhino.core.model.Entity<Long> {
 
-	private static final long serialVersionUID = 913379597228395999L;
+	private static final long serialVersionUID = -5738180139545204796L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "memoryswap_entity_seq")

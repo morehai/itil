@@ -30,17 +30,17 @@ import org.ironrhino.core.util.BeanUtils;
  * </code>
  */
 @Entity
-@Table(name = "system")
+@Table(name = "itil_systems")
 @Searchable
 @AutoConfig
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
-public class System extends org.ironrhino.core.model.Entity<Long> {
+public class Systems extends org.ironrhino.core.model.Entity<Long> {
 
-	private static final long serialVersionUID = 9145676201413529846L;
+	private static final long serialVersionUID = -5551694684870577298L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO, generator = "system_entity_seq")
-	@SequenceGenerator(name = "system_entity_seq", sequenceName = "system_entity_seq")
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "systems_entity_seq")
+	@SequenceGenerator(name = "systems_entity_seq", sequenceName = "systems_entity_seq", allocationSize = 1)
 	private Long id;
 
 	/**
@@ -86,10 +86,10 @@ public class System extends org.ironrhino.core.model.Entity<Long> {
 	@JoinColumn(name = "taskId", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	private Task task;
 
-	public System() {
+	public Systems() {
 	}
 
-	public System(com.wao.itil.model.glances.System systemGlances) {
+	public Systems(com.wao.itil.model.glances.System systemGlances) {
 		BeanUtils.copyProperties(systemGlances, this);
 		osName = systemGlances.getOs_name();
 		linuxDistro = systemGlances.getLinux_distro();

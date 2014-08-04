@@ -35,11 +35,11 @@ import org.ironrhino.core.security.role.UserRole;
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 public class Core extends org.ironrhino.core.model.Entity<Long> {
 
-	private static final long serialVersionUID = -485467448045298243L;
+	private static final long serialVersionUID = -6503346495032442387L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "core_entity_seq")
-	@SequenceGenerator(name = "core_entity_seq", sequenceName = "core_entity_seq")
+	@SequenceGenerator(name = "core_entity_seq", sequenceName = "core_entity_seq", allocationSize = 1)
 	private Long id;
 
 	/**

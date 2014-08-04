@@ -40,7 +40,7 @@ import org.ironrhino.core.util.BeanUtils;
 public class Network extends org.ironrhino.core.model.Entity<Long> {
 
 	private static final long serialVersionUID = 8830554327519962985L;
-
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "network_entity_seq")
 	@SequenceGenerator(name = "network_entity_seq", sequenceName = "network_entity_seq")

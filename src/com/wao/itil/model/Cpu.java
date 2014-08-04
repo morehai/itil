@@ -37,7 +37,7 @@ import org.ironrhino.core.util.BeanUtils;
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 public class Cpu extends org.ironrhino.core.model.Entity<Long> {
 
-	private static final long serialVersionUID = -485467448045298243L;
+	private static final long serialVersionUID = -6523084618678359538L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "cpu_entity_seq")
