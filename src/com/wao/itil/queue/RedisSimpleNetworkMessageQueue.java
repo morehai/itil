@@ -15,8 +15,7 @@ import com.wao.itil.model.Network;
 import com.wao.itil.service.TaskManager;
 
 @Component
-public class RedisSimpleNetworkMessageQueue extends
-		RedisQueue<LinkedList<Network>> {
+public class RedisSimpleNetworkMessageQueue extends RedisQueue<Network> {
 
 	@Autowired(required = false)
 	private ExecutorService executorService;
@@ -58,10 +57,8 @@ public class RedisSimpleNetworkMessageQueue extends
 	}
 
 	@Override
-	public void consume(LinkedList<Network> networks) {
-		for (Network network : networks) {
-			baseManager.save(network);
-		}
+	public void consume(Network network) {
+		baseManager.save(network);
 	}
 
 }

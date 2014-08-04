@@ -31,7 +31,7 @@ import com.wao.itil.queue.RedisSimpleMemoryMessageQueue;
 import com.wao.itil.queue.RedisSimpleMemorySwapMessageQueue;
 import com.wao.itil.queue.RedisSimpleNetworkMessageQueue;
 import com.wao.itil.queue.RedisSimpleProcessCountMessageQueue;
-import com.wao.itil.queue.RedisSimpleProcessMessageQueue;
+import com.wao.itil.queue.RedisSimpleProcessorMessageQueue;
 import com.wao.itil.queue.RedisSimpleSystemsMessageQueue;
 
 /**
@@ -61,7 +61,7 @@ public class GlancesTaskService {
 	@Autowired
 	private RedisSimpleMemorySwapMessageQueue redisSimpleMemorySwapMessageQueue;
 	@Autowired
-	private RedisSimpleProcessMessageQueue redisSimpleProcessMessageQueue;
+	private RedisSimpleProcessorMessageQueue redisSimpleProcessMessageQueue;
 	@Autowired
 	private RedisSimpleProcessCountMessageQueue redisSimpleProcessCountMessageQueue;
 	@Autowired
@@ -302,14 +302,12 @@ public class GlancesTaskService {
 					List<com.wao.itil.model.glances.Process> processGlancesList = JsonUtils
 							.fromJson(respMap.get("getProcessList"),
 									PROCESS_LIST_TYPE);
-					LinkedList<com.wao.itil.model.Process> processList = new LinkedList<com.wao.itil.model.Process>();
 					for (com.wao.itil.model.glances.Process processGlances : processGlancesList) {
-						com.wao.itil.model.Process process = new com.wao.itil.model.Process(
+						com.wao.itil.model.Processor processor = new com.wao.itil.model.Processor(
 								processGlances);
-						process.setTask(task);
-						processList.add(process);
+						processor.setTask(task);
+						redisSimpleProcessMessageQueue.produce(processor);
 					}
-					redisSimpleProcessMessageQueue.produce(processList);
 				}
 				break;
 			case "getNetwork":
@@ -322,9 +320,8 @@ public class GlancesTaskService {
 						com.wao.itil.model.Network network = new com.wao.itil.model.Network(
 								networkGlances);
 						network.setTask(task);
-						networkList.add(network);
+						redisSimpleNetworkMessageQueue.produce(network);
 					}
-					redisSimpleNetworkMessageQueue.produce(networkList);
 				}
 				break;
 			case "getSystem":

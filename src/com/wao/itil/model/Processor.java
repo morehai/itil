@@ -38,17 +38,17 @@ import org.ironrhino.core.util.BeanUtils;
  * </code>
  */
 @Entity
-@Table(name = "itil_process")
+@Table(name = "itil_processor")
 @Searchable
 @AutoConfig
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
-public class Process extends org.ironrhino.core.model.Entity<Long> {
+public class Processor extends org.ironrhino.core.model.Entity<Long> {
 
 	private static final long serialVersionUID = 38370346475256934L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO, generator = "process_entity_seq")
-	@SequenceGenerator(name = "process_entity_seq", sequenceName = "process_entity_seq")
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "processor_entity_seq")
+	@SequenceGenerator(name = "processor_entity_seq", sequenceName = "processor_entity_seq")
 	private Long id;
 
 	/**
@@ -114,10 +114,10 @@ public class Process extends org.ironrhino.core.model.Entity<Long> {
 	@JoinColumn(name = "taskId", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	private Task task;
 
-	public Process() {
+	public Processor() {
 	}
 
-	public Process(com.wao.itil.model.glances.Process processGlances) {
+	public Processor(com.wao.itil.model.glances.Process processGlances) {
 		BeanUtils.copyProperties(processGlances, this);
 		cpuTimes = processGlances.getCpu_times();
 		memoryPercent = processGlances.getMemory_percent();

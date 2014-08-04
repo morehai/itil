@@ -1,6 +1,5 @@
 package com.wao.itil.queue;
 
-import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
 
 import javax.annotation.PostConstruct;
@@ -11,17 +10,16 @@ import org.ironrhino.core.service.BaseManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.wao.itil.model.Process;
+import com.wao.itil.model.Processor;
 
 @Component
-public class RedisSimpleProcessMessageQueue extends
-		RedisQueue<LinkedList<Process>> {
+public class RedisSimpleProcessorMessageQueue extends RedisQueue<Processor> {
 
 	@Autowired(required = false)
 	private ExecutorService executorService;
 
 	@Autowired
-	private BaseManager<Process> baseManager;
+	private BaseManager<Processor> baseManager;
 
 	private boolean stop;
 
@@ -55,10 +53,8 @@ public class RedisSimpleProcessMessageQueue extends
 	}
 
 	@Override
-	public void consume(LinkedList<Process> processList) {
-		for (Process process : processList) {
-			baseManager.save(process);
-		}
+	public void consume(Processor processor) {
+		baseManager.save(processor);
 	}
 
 }
