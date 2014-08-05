@@ -28,7 +28,7 @@ import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.Hidden;
 import org.ironrhino.core.metadata.NotInCopy;
 import org.ironrhino.core.metadata.NotInJson;
-import org.ironrhino.core.metadata.Readonly;
+import org.ironrhino.core.metadata.Richtable;
 import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableId;
@@ -36,10 +36,8 @@ import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.security.model.User;
 
 import com.wao.itil.model.enums.AlarmNoticeType;
-import com.wao.itil.model.enums.GlancesMethodType;
 import com.wao.itil.model.enums.MonitorFrequenceType;
 import com.wao.itil.model.enums.SequenceAlarmType;
-import com.wao.itil.model.enums.ServerMonitorType;
 
 /**
  * 服务器监控任务模型
@@ -49,6 +47,7 @@ import com.wao.itil.model.enums.ServerMonitorType;
 @Searchable
 @AutoConfig(namespace = "/itil")
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
+@Richtable(searchable = true, order = "createDate desc")
 public class Task extends org.ironrhino.core.model.Entity<Long> {
 
 	private static final long serialVersionUID = -3599196510760852871L;
@@ -69,18 +68,6 @@ public class Task extends org.ironrhino.core.model.Entity<Long> {
 	 */
 	@Column(nullable = false)
 	private String taskName;
-
-	/**
-	 * 监控类型（复选）
-	 */
-//	@Enumerated
-//	private ServerMonitorType serverMonitorType;
-	
-	/**
-	 * 调用方法（复选）
-	 */
-//	@Enumerated
-//	private GlancesMethodType glancesMethodType;
 
 	/**
 	 * 监控频率（单选）
@@ -128,7 +115,7 @@ public class Task extends org.ironrhino.core.model.Entity<Long> {
 	@NotInJson
 	@Column(updatable = false)
 	@UiConfig(hidden = true)
-	private Date createTime = new Date();
+	private Date createDate = new Date();
 
 	// 监控类型集合
 	@Transient
@@ -172,13 +159,13 @@ public class Task extends org.ironrhino.core.model.Entity<Long> {
 		this.taskName = taskName;
 	}
 
-//	public ServerMonitorType getServerMonitorType() {
-//		return serverMonitorType;
-//	}
-//
-//	public void setServerMonitorType(ServerMonitorType serverMonitorType) {
-//		this.serverMonitorType = serverMonitorType;
-//	}
+	// public ServerMonitorType getServerMonitorType() {
+	// return serverMonitorType;
+	// }
+	//
+	// public void setServerMonitorType(ServerMonitorType serverMonitorType) {
+	// this.serverMonitorType = serverMonitorType;
+	// }
 
 	public MonitorFrequenceType getMonitorFrequenceType() {
 		return monitorFrequenceType;
@@ -237,12 +224,12 @@ public class Task extends org.ironrhino.core.model.Entity<Long> {
 		this.lastExecuted = lastExecuted;
 	}
 
-	public Date getCreateTime() {
-		return createTime;
+	public Date getCreateDate() {
+		return createDate;
 	}
 
-	public void setCreateTime(Date createTime) {
-		this.createTime = createTime;
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
 	}
 
 	public Set<String> getServerMonitors() {

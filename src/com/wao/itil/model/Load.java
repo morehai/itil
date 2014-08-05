@@ -18,6 +18,8 @@ import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.Hidden;
 import org.ironrhino.core.metadata.NotInJson;
+import org.ironrhino.core.metadata.Readonly;
+import org.ironrhino.core.metadata.Richtable;
 import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableId;
@@ -32,8 +34,9 @@ import org.ironrhino.core.util.BeanUtils;
 @Entity
 @Table(name = "itil_load")
 @Searchable
-@AutoConfig
+@AutoConfig(namespace = "/itil")
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
+@Richtable(searchable = true, order = "createDate desc", celleditable = false, readonly = @Readonly(true))
 public class Load extends org.ironrhino.core.model.Entity<Long> {
 
 	private static final long serialVersionUID = -3642929446480395590L;

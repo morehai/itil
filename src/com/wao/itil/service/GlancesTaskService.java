@@ -69,6 +69,10 @@ public class GlancesTaskService {
 	@Autowired
 	private RedisSimpleSystemsMessageQueue redisSimpleSystemMessageQueue;
 
+	private static final TypeReference<LinkedList<com.wao.itil.model.glances.Diskio>> DISKIO_LIST_TYPE = new TypeReference<LinkedList<com.wao.itil.model.glances.Diskio>>() {
+	};
+	private static final TypeReference<LinkedList<com.wao.itil.model.glances.FileSystem>> FILESYSTEM_LIST_TYPE = new TypeReference<LinkedList<com.wao.itil.model.glances.FileSystem>>() {
+	};
 	private static final TypeReference<LinkedList<com.wao.itil.model.glances.Process>> PROCESS_LIST_TYPE = new TypeReference<LinkedList<com.wao.itil.model.glances.Process>>() {
 	};
 	private static final TypeReference<LinkedList<com.wao.itil.model.glances.Network>> NETWORK_LIST_TYPE = new TypeReference<LinkedList<com.wao.itil.model.glances.Network>>() {
@@ -232,24 +236,28 @@ public class GlancesTaskService {
 				break;
 			case "getDiskIO":
 				if (respMap.get("getDiskIO") != null) {
-					com.wao.itil.model.glances.Diskio diskioGlances = JsonUtils
+					List<com.wao.itil.model.glances.Diskio> diskioGlancesList = JsonUtils
 							.fromJson(respMap.get("getDiskIO"),
-									com.wao.itil.model.glances.Diskio.class);
-					com.wao.itil.model.Diskio diskio = new com.wao.itil.model.Diskio(
-							diskioGlances);
-					diskio.setTask(task);
-					redisSimpleDiskioMessageQueue.produce(diskio);
+									DISKIO_LIST_TYPE);
+					for (com.wao.itil.model.glances.Diskio diskioGlances : diskioGlancesList) {
+						com.wao.itil.model.Diskio diskio = new com.wao.itil.model.Diskio(
+								diskioGlances);
+						diskio.setTask(task);
+						redisSimpleDiskioMessageQueue.produce(diskio);
+					}
 				}
 				break;
 			case "getFs":
 				if (respMap.get("getFs") != null) {
-					com.wao.itil.model.glances.FileSystem fileSystemGlances = JsonUtils
+					List<com.wao.itil.model.glances.FileSystem> fileSystemGlancesList = JsonUtils
 							.fromJson(respMap.get("getFs"),
-									com.wao.itil.model.glances.FileSystem.class);
-					com.wao.itil.model.FileSystem fileSystem = new com.wao.itil.model.FileSystem(
-							fileSystemGlances);
-					fileSystem.setTask(task);
-					redisSimpleFileSystemMessageQueue.produce(fileSystem);
+									FILESYSTEM_LIST_TYPE);
+					for (com.wao.itil.model.glances.FileSystem fileSystemGlances : fileSystemGlancesList) {
+						com.wao.itil.model.FileSystem fileSystem = new com.wao.itil.model.FileSystem(
+								fileSystemGlances);
+						fileSystem.setTask(task);
+						redisSimpleFileSystemMessageQueue.produce(fileSystem);
+					}
 				}
 				break;
 			case "getLoad":

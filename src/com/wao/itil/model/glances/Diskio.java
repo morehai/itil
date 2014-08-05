@@ -27,13 +27,13 @@ public class Diskio implements Serializable {
 	 * 读取字节数
 	 */
 	@NotInCopy
-	private int read_bytes;
+	private long read_bytes;
 
 	/**
 	 * 写入字节数
 	 */
 	@NotInCopy
-	private int write_bytes;
+	private long write_bytes;
 
 	/**
 	 * 读取的时间点
@@ -53,19 +53,19 @@ public class Diskio implements Serializable {
 		this.time_since_update = time_since_update;
 	}
 
-	public int getRead_bytes() {
+	public long getRead_bytes() {
 		return read_bytes;
 	}
 
-	public void setRead_bytes(int read_bytes) {
+	public void setRead_bytes(long read_bytes) {
 		this.read_bytes = read_bytes;
 	}
 
-	public int getWrite_bytes() {
+	public long getWrite_bytes() {
 		return write_bytes;
 	}
 
-	public void setWrite_bytes(int write_bytes) {
+	public void setWrite_bytes(long write_bytes) {
 		this.write_bytes = write_bytes;
 	}
 
@@ -75,14 +75,6 @@ public class Diskio implements Serializable {
 
 	public void setDisk_name(String disk_name) {
 		this.disk_name = disk_name;
-	}
-
-	public long getBytesReadPerSec() {
-		return (long) (getRead_bytes() / getTime_since_update());
-	}
-
-	public long getBytesWrittenPerSec() {
-		return (long) (getWrite_bytes() / getTime_since_update());
 	}
 
 }
