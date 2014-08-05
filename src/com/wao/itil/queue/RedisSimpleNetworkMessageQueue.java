@@ -1,13 +1,12 @@
 package com.wao.itil.queue;
 
-import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.ironrhino.core.redis.RedisQueue;
-import org.ironrhino.core.service.BaseManager;
+import org.ironrhino.core.service.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -21,7 +20,7 @@ public class RedisSimpleNetworkMessageQueue extends RedisQueue<Network> {
 	private ExecutorService executorService;
 
 	@Autowired
-	private BaseManager<Network> baseManager;
+	private EntityManager<Network> entityManager;
 	@Autowired
 	private TaskManager taskManager;
 
@@ -58,7 +57,7 @@ public class RedisSimpleNetworkMessageQueue extends RedisQueue<Network> {
 
 	@Override
 	public void consume(Network network) {
-		baseManager.save(network);
+		entityManager.save(network);
 	}
 
 }

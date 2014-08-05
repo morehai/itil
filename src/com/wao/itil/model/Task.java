@@ -263,6 +263,14 @@ public class Task extends org.ironrhino.core.model.Entity<Long> {
 							serverMonitorsAsString, ",").split("\\s*,\\s*")));
 	}
 
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
 	@Override
 	@NotInJson
 	public boolean isNew() {

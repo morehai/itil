@@ -6,7 +6,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.ironrhino.core.redis.RedisQueue;
-import org.ironrhino.core.service.BaseManager;
+import org.ironrhino.core.service.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +19,7 @@ public class RedisSimpleFileSystemMessageQueue extends RedisQueue<FileSystem> {
 	private ExecutorService executorService;
 
 	@Autowired
-	private BaseManager<FileSystem> baseManager;
+	private EntityManager<FileSystem> entityManager;
 
 	private boolean stop;
 
@@ -54,7 +54,7 @@ public class RedisSimpleFileSystemMessageQueue extends RedisQueue<FileSystem> {
 
 	@Override
 	public void consume(FileSystem fileSystem) {
-		baseManager.save(fileSystem);
+		entityManager.save(fileSystem);
 	}
 
 }

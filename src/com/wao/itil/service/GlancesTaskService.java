@@ -138,8 +138,8 @@ public class GlancesTaskService {
 	/**
 	 * 通过单次监控任务配置获取到服务器相关的监控项信息
 	 */
-//	@Scheduled(cron = "5 * * * * ?")
-//	@Trigger
+	// @Scheduled(cron = "5 * * * * ?")
+	// @Trigger
 	public void batchSyncServerInfoForTask() {
 		if (lockService.tryLock(lockName)) {
 			try {
@@ -315,7 +315,6 @@ public class GlancesTaskService {
 					List<com.wao.itil.model.glances.Network> networkGlancesList = JsonUtils
 							.fromJson(respMap.get("getNetwork"),
 									NETWORK_LIST_TYPE);
-					LinkedList<com.wao.itil.model.Network> networkList = new LinkedList<com.wao.itil.model.Network>();
 					for (com.wao.itil.model.glances.Network networkGlances : networkGlancesList) {
 						com.wao.itil.model.Network network = new com.wao.itil.model.Network(
 								networkGlances);

@@ -6,7 +6,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.ironrhino.core.redis.RedisQueue;
-import org.ironrhino.core.service.BaseManager;
+import org.ironrhino.core.service.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +20,7 @@ public class RedisSimpleProcessCountMessageQueue extends
 	private ExecutorService executorService;
 
 	@Autowired
-	private BaseManager<ProcessCount> baseManager;
+	private EntityManager<ProcessCount> entityManager;
 
 	private boolean stop;
 
@@ -55,7 +55,7 @@ public class RedisSimpleProcessCountMessageQueue extends
 
 	@Override
 	public void consume(ProcessCount processCount) {
-		baseManager.save(processCount);
+		entityManager.save(processCount);
 	}
 
 }

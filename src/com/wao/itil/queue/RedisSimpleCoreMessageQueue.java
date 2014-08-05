@@ -6,7 +6,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.ironrhino.core.redis.RedisQueue;
-import org.ironrhino.core.service.BaseManager;
+import org.ironrhino.core.service.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +20,7 @@ public class RedisSimpleCoreMessageQueue extends RedisQueue<Core> {
 	private ExecutorService executorService;
 
 	@Autowired
-	private BaseManager<Core> baseManager;
+	private EntityManager<Core> entityManager;
 	@Autowired
 	private TaskManager taskManager;
 
@@ -57,7 +57,7 @@ public class RedisSimpleCoreMessageQueue extends RedisQueue<Core> {
 
 	@Override
 	public void consume(Core core) {
-		baseManager.save(core);
+		entityManager.save(core);
 	}
 
 }
