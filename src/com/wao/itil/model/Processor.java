@@ -2,6 +2,7 @@ package com.wao.itil.model;
 
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -91,6 +92,7 @@ public class Processor extends org.ironrhino.core.model.Entity<Long> {
 	 * (display the IO rate)
 	 */
 	private long[] ioCounters;
+	@Column(length = 500)
 	private String cmdline;
 	private long[] memoryInfo;
 	private long nice;

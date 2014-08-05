@@ -10,7 +10,8 @@ import com.opensymphony.xwork2.util.LocalizedTextUtil;
  */
 public enum ServerMonitorType implements Displayable {
 
-	CPU, CPU_LOAD, MEMORY, MEMORY_SWAP, NET, DISK, DISK_IO, FILE, PROCESS, SYSTEM, SENSOR;
+	//CPU, CPU_LOAD, MEMORY, MEMORY_SWAP, NET, DISK, DISK_IO, FILE, PROCESS, SYSTEM, SENSOR;
+	getCore, getCpu, getLoad, getDiskIO, getFs, getMem, getMemSwap, getNetwork, getProcessCount, getProcessList, getSystem; // getHDDTemp, getNow, getBatPercent, getSensors, getAllLimits, getAllMonitored;
 
 	@Override
 	public String getName() {

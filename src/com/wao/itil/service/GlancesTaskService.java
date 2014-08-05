@@ -119,7 +119,7 @@ public class GlancesTaskService {
 			host = "http://" + host + ":61209/RPC2";
 		}
 		if (StringUtils.isNotBlank(method)) {
-			host = "<methodName>" + method + "</methodName>";
+			method = "<methodName>" + method + "</methodName>";
 		}
 
 		String resp = HttpClientUtils.post(host, method);
@@ -143,14 +143,14 @@ public class GlancesTaskService {
 	public void batchSyncServerInfoForTask() {
 		if (lockService.tryLock(lockName)) {
 			try {
-				List<Task> list = taskManager.findByUnExecuted();
+				List<Task> taskList = taskManager.findByUnExecuted();
 				int index = 0;
-				while (index < list.size()) {
-					int acturalSize = Math.min(batchSyncSize, list.size()
+				while (index < taskList.size()) {
+					int acturalSize = Math.min(batchSyncSize, taskList.size()
 							- index);
 					final CountDownLatch cdl = new CountDownLatch(acturalSize);
 					for (int i = 0; i < acturalSize; i++) {
-						final Task task = list.get(index++);
+						final Task task = taskList.get(index++);
 						executorService.execute(new Runnable() {
 							@Override
 							public void run() {

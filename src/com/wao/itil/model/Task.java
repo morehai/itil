@@ -28,6 +28,7 @@ import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.Hidden;
 import org.ironrhino.core.metadata.NotInCopy;
 import org.ironrhino.core.metadata.NotInJson;
+import org.ironrhino.core.metadata.Readonly;
 import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableId;
@@ -35,6 +36,7 @@ import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.security.model.User;
 
 import com.wao.itil.model.enums.AlarmNoticeType;
+import com.wao.itil.model.enums.GlancesMethodType;
 import com.wao.itil.model.enums.MonitorFrequenceType;
 import com.wao.itil.model.enums.SequenceAlarmType;
 import com.wao.itil.model.enums.ServerMonitorType;
@@ -45,7 +47,7 @@ import com.wao.itil.model.enums.ServerMonitorType;
 @Entity
 @Table(name = "itil_task")
 @Searchable
-@AutoConfig
+@AutoConfig(namespace = "/itil")
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 public class Task extends org.ironrhino.core.model.Entity<Long> {
 
@@ -71,8 +73,14 @@ public class Task extends org.ironrhino.core.model.Entity<Long> {
 	/**
 	 * 监控类型（复选）
 	 */
-	@Enumerated
-	private ServerMonitorType serverMonitorType;
+//	@Enumerated
+//	private ServerMonitorType serverMonitorType;
+	
+	/**
+	 * 调用方法（复选）
+	 */
+//	@Enumerated
+//	private GlancesMethodType glancesMethodType;
 
 	/**
 	 * 监控频率（单选）
@@ -95,7 +103,7 @@ public class Task extends org.ironrhino.core.model.Entity<Long> {
 	/**
 	 * 是否保存为模板
 	 */
-	private boolean templatable;
+	private boolean templatable = false;
 
 	/**
 	 * 模板名称
@@ -103,13 +111,14 @@ public class Task extends org.ironrhino.core.model.Entity<Long> {
 	private String templateName;
 
 	/**
-	 * 任务是否被成功调度
+	 * 任务是否已被成功调度
 	 */
-	private boolean successExecuted;
+	private boolean successExecuted = false;
 
 	/**
 	 * 上次执行时间点
 	 */
+	@UiConfig(hiddenInList = @Hidden(true))
 	private Date lastExecuted;
 
 	/**
@@ -122,8 +131,8 @@ public class Task extends org.ironrhino.core.model.Entity<Long> {
 	private Date createTime = new Date();
 
 	// 监控类型集合
-	@UiConfig(hiddenInList = @Hidden(true))
 	@Transient
+	@UiConfig(hiddenInList = @Hidden(true))
 	private Set<String> serverMonitors = new HashSet<String>(0);
 
 	// 创建者
@@ -163,13 +172,13 @@ public class Task extends org.ironrhino.core.model.Entity<Long> {
 		this.taskName = taskName;
 	}
 
-	public ServerMonitorType getServerMonitorType() {
-		return serverMonitorType;
-	}
-
-	public void setServerMonitorType(ServerMonitorType serverMonitorType) {
-		this.serverMonitorType = serverMonitorType;
-	}
+//	public ServerMonitorType getServerMonitorType() {
+//		return serverMonitorType;
+//	}
+//
+//	public void setServerMonitorType(ServerMonitorType serverMonitorType) {
+//		this.serverMonitorType = serverMonitorType;
+//	}
 
 	public MonitorFrequenceType getMonitorFrequenceType() {
 		return monitorFrequenceType;
