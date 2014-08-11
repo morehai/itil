@@ -47,16 +47,6 @@ public class Systems extends org.ironrhino.core.model.Entity<Long> {
 	private Long id;
 
 	/**
-	 * 服务器地址
-	 */
-	private String host;
-
-	/**
-	 * 服务器名称
-	 */
-	private String hostName;
-
-	/**
 	 * 操作系统名称
 	 */
 	private String osName;
@@ -107,22 +97,6 @@ public class Systems extends org.ironrhino.core.model.Entity<Long> {
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public String getHost() {
-		return host;
-	}
-
-	public void setHost(String host) {
-		this.host = host;
-	}
-
-	public String getHostName() {
-		return hostName;
-	}
-
-	public void setHostName(String hostName) {
-		this.hostName = hostName;
 	}
 
 	public String getOsName() {

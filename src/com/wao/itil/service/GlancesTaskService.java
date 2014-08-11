@@ -15,6 +15,8 @@ import org.ironrhino.core.coordination.LockService;
 import org.ironrhino.core.util.ErrorMessage;
 import org.ironrhino.core.util.HttpClientUtils;
 import org.ironrhino.core.util.JsonUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -35,10 +37,14 @@ import com.wao.itil.queue.RedisSimpleProcessorMessageQueue;
 import com.wao.itil.queue.RedisSimpleSystemsMessageQueue;
 
 /**
- * 任务通过Glances代理获取被监控服务器信息
+ * 任务通过Glances代理获取被监控服务器信息 5线程轮询1台服务器时间：28秒(串行请求9个API数据)
+ * 5线程轮询5台服务器时间：29秒(串行请求9个API数据) 5线程轮询6台服务器时间：64秒(串行请求9个API数据)
+ * 6线程轮询6台服务器时间：29秒(串行请求9个API数据)
  */
 @Component
 public class GlancesTaskService {
+
+	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Autowired
 	private LockService lockService;
@@ -88,20 +94,22 @@ public class GlancesTaskService {
 	 * @return 服务器运行时信息集合
 	 * @throws IOException
 	 */
-	public Map<String, String> getServerInfoByAgent(String host,
-			String[] methods) {
+	public Map<String, String> getServerInfoByAgent(Task task, String[] methods) {
 		if (methods == null || methods.length == 0) {
 			return new HashMap<String, String>();
 		}
 		Map<String, String> respMap = new HashMap<String, String>();
 		for (String method : methods) {
+			String resp;
 			try {
-				respMap.put(method, getServerInfoByAgent(host, method));
+				resp = getServerInfoByAgent(task.getHost(), method);
 			} catch (IOException e) {
 				e.printStackTrace();
-				// TODO 将任务的服务器信息写入网络连接异常表中
+				// 网络连接异常 导致任务执行失败信息保存
+				logger.error(e.getMessage()+"|"+task.getId()+"|"+method);
 				continue;
 			}
+			respMap.put(method, resp);
 		}
 		return respMap;
 	}
@@ -125,7 +133,8 @@ public class GlancesTaskService {
 		if (StringUtils.isNotBlank(method)) {
 			method = "<methodName>" + method + "</methodName>";
 		}
-
+		System.out.println("before: HOST: " + host + "      METHOD: " + method
+				+ "      " + System.currentTimeMillis());
 		String resp = HttpClientUtils.post(host, method);
 		if (resp.indexOf("<string>") > 0) {
 			resp = resp.substring(resp.indexOf("<string>") + 8,
@@ -133,11 +142,13 @@ public class GlancesTaskService {
 		} else {
 			return null;
 		}
+		System.out.println("after: HOST: " + host + "      METHOD: " + method
+				+ "      " + System.currentTimeMillis());
 		return resp;
 	}
 
 	private String lockName = "TaskGlancesServiceImpl.batchSyncServerInfoForTask";
-	private int batchSyncSize = 5;
+	private int batchSyncSize = 500;
 
 	/**
 	 * 通过单次监控任务配置获取到服务器相关的监控项信息
@@ -161,7 +172,7 @@ public class GlancesTaskService {
 								String[] methods = task
 										.getServerMonitorsAsString().split(",");
 								Map<String, String> respMap = getServerInfoByAgent(
-										task.getHost(), methods);
+										task, methods);
 								try {
 									transferServerInfo(task, respMap);
 								} catch (JsonParseException e) {
@@ -170,7 +181,8 @@ public class GlancesTaskService {
 									e.printStackTrace();
 								} catch (IOException e) {
 									e.printStackTrace();
-									// TODO 将任务的服务器信息写入网络连接异常表中
+									logger.error(e.getMessage(), task.getHost(), task.getId(),
+											task.getTaskName());
 								}
 								cdl.countDown();
 							}
@@ -213,7 +225,7 @@ public class GlancesTaskService {
 			// 1、将map中的JSON串转换成相应的对象；
 			// 2、将对象放入消息队列发送；
 			case "getCore":
-				if (respMap.get("getCore") != null) {
+				if (StringUtils.isNotBlank(respMap.get("getCore"))) {
 					com.wao.itil.model.glances.Core coreGlances = JsonUtils
 							.fromJson(respMap.get("getCore"),
 									com.wao.itil.model.glances.Core.class);
@@ -224,7 +236,7 @@ public class GlancesTaskService {
 				}
 				break;
 			case "getCpu":
-				if (respMap.get("getCpu") != null) {
+				if (StringUtils.isNotBlank(respMap.get("getCpu"))) {
 					com.wao.itil.model.glances.Cpu cpuGlances = JsonUtils
 							.fromJson(respMap.get("getCpu"),
 									com.wao.itil.model.glances.Cpu.class);
@@ -235,7 +247,7 @@ public class GlancesTaskService {
 				}
 				break;
 			case "getDiskIO":
-				if (respMap.get("getDiskIO") != null) {
+				if (StringUtils.isNotBlank(respMap.get("getDiskIO"))) {
 					List<com.wao.itil.model.glances.Diskio> diskioGlancesList = JsonUtils
 							.fromJson(respMap.get("getDiskIO"),
 									DISKIO_LIST_TYPE);
@@ -248,7 +260,7 @@ public class GlancesTaskService {
 				}
 				break;
 			case "getFs":
-				if (respMap.get("getFs") != null) {
+				if (StringUtils.isNotBlank(respMap.get("getFs"))) {
 					List<com.wao.itil.model.glances.FileSystem> fileSystemGlancesList = JsonUtils
 							.fromJson(respMap.get("getFs"),
 									FILESYSTEM_LIST_TYPE);
@@ -261,7 +273,7 @@ public class GlancesTaskService {
 				}
 				break;
 			case "getLoad":
-				if (respMap.get("getLoad") != null) {
+				if (StringUtils.isNotBlank(respMap.get("getLoad"))) {
 					com.wao.itil.model.glances.Load loadGlances = JsonUtils
 							.fromJson(respMap.get("getLoad"),
 									com.wao.itil.model.glances.Load.class);
@@ -272,7 +284,7 @@ public class GlancesTaskService {
 				}
 				break;
 			case "getMem":
-				if (respMap.get("getMem") != null) {
+				if (StringUtils.isNotBlank(respMap.get("getMem"))) {
 					com.wao.itil.model.glances.Memory memoryGlances = JsonUtils
 							.fromJson(respMap.get("getMem"),
 									com.wao.itil.model.glances.Memory.class);
@@ -283,7 +295,7 @@ public class GlancesTaskService {
 				}
 				break;
 			case "getMemSwap":
-				if (respMap.get("getMemSwap") != null) {
+				if (StringUtils.isNotBlank(respMap.get("getMemSwap"))) {
 					com.wao.itil.model.glances.MemorySwap memorySwapGlances = JsonUtils
 							.fromJson(respMap.get("getMemSwap"),
 									com.wao.itil.model.glances.MemorySwap.class);
@@ -294,7 +306,7 @@ public class GlancesTaskService {
 				}
 				break;
 			case "getProcessCount":
-				if (respMap.get("getProcessCount") != null) {
+				if (StringUtils.isNotBlank(respMap.get("getProcessCount"))) {
 					com.wao.itil.model.glances.ProcessCount processCountGlances = JsonUtils
 							.fromJson(
 									respMap.get("getProcessCount"),
@@ -306,7 +318,7 @@ public class GlancesTaskService {
 				}
 				break;
 			case "getProcessList":
-				if (respMap.get("getProcessList") != null) {
+				if (StringUtils.isNotBlank(respMap.get("getProcessList"))) {
 					List<com.wao.itil.model.glances.Process> processGlancesList = JsonUtils
 							.fromJson(respMap.get("getProcessList"),
 									PROCESS_LIST_TYPE);
@@ -319,7 +331,7 @@ public class GlancesTaskService {
 				}
 				break;
 			case "getNetwork":
-				if (respMap.get("getNetwork") != null) {
+				if (StringUtils.isNotBlank(respMap.get("getNetwork"))) {
 					List<com.wao.itil.model.glances.Network> networkGlancesList = JsonUtils
 							.fromJson(respMap.get("getNetwork"),
 									NETWORK_LIST_TYPE);
@@ -332,7 +344,7 @@ public class GlancesTaskService {
 				}
 				break;
 			case "getSystem":
-				if (respMap.get("getSystem") != null) {
+				if (StringUtils.isNotBlank(respMap.get("getSystem"))) {
 					com.wao.itil.model.glances.System systemGlances = JsonUtils
 							.fromJson(respMap.get("getSystem"),
 									com.wao.itil.model.glances.System.class);

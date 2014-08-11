@@ -29,7 +29,7 @@ public class TestZabbixAPI {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
 }

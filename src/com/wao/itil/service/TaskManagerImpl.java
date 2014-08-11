@@ -17,6 +17,6 @@ public class TaskManagerImpl extends BaseManagerImpl<Task> implements
 	public List<Task> findByUnExecuted() {
 		DetachedCriteria dc = detachedCriteria();
 		dc.add(Restrictions.eq("successExecuted", false));
-		return findListByCriteria(dc, 1, 5);
+		return findListByCriteria(dc, 1, 500);
 	}
 }
