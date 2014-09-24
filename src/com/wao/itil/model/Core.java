@@ -17,13 +17,14 @@ import javax.persistence.Table;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.Hidden;
-import org.ironrhino.core.metadata.NotInJson;
 import org.ironrhino.core.metadata.Readonly;
 import org.ironrhino.core.metadata.Richtable;
 import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableId;
 import org.ironrhino.core.security.role.UserRole;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * 服务器CPU物理内核和逻辑内核模型 <code>
@@ -62,7 +63,7 @@ public class Core extends org.ironrhino.core.model.Entity<Long> {
 	private Date createDate = new Date();
 
 	// 关联的任务
-	@NotInJson
+	@JsonIgnore
 	@UiConfig(hiddenInView = @Hidden(true))
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "taskId", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
@@ -119,7 +120,7 @@ public class Core extends org.ironrhino.core.model.Entity<Long> {
 	}
 
 	@Override
-	@NotInJson
+	@JsonIgnore
 	public boolean isNew() {
 		return id == null || id == 0;
 	}

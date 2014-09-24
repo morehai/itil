@@ -27,7 +27,6 @@ import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.Hidden;
 import org.ironrhino.core.metadata.NotInCopy;
-import org.ironrhino.core.metadata.NotInJson;
 import org.ironrhino.core.metadata.Richtable;
 import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
@@ -35,6 +34,7 @@ import org.ironrhino.core.search.elasticsearch.annotations.SearchableId;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.security.model.User;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wao.itil.model.enums.AlarmNoticeType;
 import com.wao.itil.model.enums.MonitorFrequenceType;
 import com.wao.itil.model.enums.SequenceAlarmType;
@@ -112,7 +112,7 @@ public class Task extends org.ironrhino.core.model.Entity<Long> {
 	 * 创建的时间点
 	 */
 	@NotInCopy
-	@NotInJson
+	@JsonIgnore
 	@Column(updatable = false)
 	@UiConfig(hidden = true)
 	private Date createDate = new Date();
@@ -123,7 +123,7 @@ public class Task extends org.ironrhino.core.model.Entity<Long> {
 	private Set<String> serverMonitors = new HashSet<String>(0);
 
 	// 创建者
-	@NotInJson
+	@JsonIgnore
 	@UiConfig(hiddenInView = @Hidden(true))
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "userId", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
@@ -241,7 +241,7 @@ public class Task extends org.ironrhino.core.model.Entity<Long> {
 	}
 
 	@NotInCopy
-	@NotInJson
+	@JsonIgnore
 	@Column(name = "serverMonitors", length = 500)
 	@UiConfig(hiddenInList = @Hidden(true))
 	@Access(AccessType.PROPERTY)
@@ -268,7 +268,7 @@ public class Task extends org.ironrhino.core.model.Entity<Long> {
 	}
 
 	@Override
-	@NotInJson
+	@JsonIgnore
 	public boolean isNew() {
 		return id == null || id == 0;
 	}
